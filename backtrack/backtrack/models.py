@@ -5,6 +5,8 @@ from django.db import models
 class ProductOwner(models.Model):
     name=models.CharField(max_length=20)
     email=models.CharField(max_length=30)
+    def __str__(self):
+        return name
 
 class ProductBacklog(models.Model):
     pass
@@ -14,11 +16,16 @@ class Project(models.Model):
     owner=models.ForeignKey(ProductOwner,on_delete=models.CASCADE)
     pb=models.ForeignKey(ProductBacklog, on_delete=models.CASCADE)
     create_time=models.DateField(auto_now=False, auto_now_add=True)
+    def __str__(self):
+        return name
+
 
 class  Teammember(models.Model): 
     name=models.CharField(max_length=20)
     email=models.CharField(max_length=30)
     project=models.ForeignKey(Project, on_delete=models.CASCADE)
+    def __str__(self):
+        return name
 
 
 
@@ -33,6 +40,7 @@ class PBI(models.Model):
     notstart='NO'
     stat=[(inprogress,'in progress'),(completed,'compeleted'),(notstart,'not start')]
     status=models.CharField(choices=stat, max_length=20,default=notstart)
+    
 
 class Confirmation(models.Model):
     content=models.CharField(max_length=100)
