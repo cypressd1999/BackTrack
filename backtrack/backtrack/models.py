@@ -2,24 +2,25 @@ from django.db import models
 
 # Create your models here.
 
+class ProductOwner(models.Model):
+    name=models.CharField(max_length=20)
+    email=models.CharField(max_length=30)
+
+class ProductBacklog(models.Model):
+    pass
+
 class Project(models.Model):
     name=models.CharField(max_length=50)
     owner=models.ForeignKey(ProductOwner,on_delete=models.CASCADE)
     pb=models.ForeignKey(ProductBacklog, on_delete=models.CASCADE)
     create_time=models.DateField(auto_now=False, auto_now_add=True)
 
-
-class ProductOwner(models.Model):
-    name=models.CharField(max_length=20)
-    email=models.CharField(max_length=30)
-
 class  Teammember(models.Model): 
     name=models.CharField(max_length=20)
     email=models.CharField(max_length=30)
     project=models.ForeignKey(Project, on_delete=models.CASCADE)
 
-class ProductBacklog(models.Model):
-    pass
+
 
 class PBI(models.Model):
     card=models.TextField()
