@@ -2,19 +2,19 @@ from django.db import models
 
 # Create your models here.
 
-class ProductOwner(models.Model):
+class Productowner(models.Model):
     name=models.CharField(max_length=20)
     email=models.CharField(max_length=30)
     def __str__(self):
         return name
 
-class ProductBacklog(models.Model):
+class Productbacklog(models.Model):
     pass
 
 class Project(models.Model):
     name=models.CharField(max_length=50)
-    owner=models.ForeignKey(ProductOwner,on_delete=models.CASCADE)
-    pb=models.ForeignKey(ProductBacklog, on_delete=models.CASCADE)
+    owner=models.ForeignKey(Productowner,on_delete=models.CASCADE)
+    pb=models.ForeignKey(Productbacklog, on_delete=models.CASCADE)
     create_time=models.DateField(auto_now=False, auto_now_add=True)
     def __str__(self):
         return name
@@ -29,7 +29,7 @@ class  Teammember(models.Model):
 
 
 
-class PBI(models.Model):
+class Pbi(models.Model):
     card=models.TextField()
     conversation=models.CharField(max_length=100)
     storypoints=models.IntegerField()
@@ -45,6 +45,6 @@ class PBI(models.Model):
 class Confirmation(models.Model):
     content=models.CharField(max_length=100)
     done=models.BooleanField()
-    pbi=models.ForeignKey(PBI, on_delete=models.CASCADE)
+    pbi=models.ForeignKey(Pbi, on_delete=models.CASCADE)
 
 
