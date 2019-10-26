@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HProduct Backlog</title>
+    <link rel="stylesheet" type="text/css" href="backtrack/style.css">
+</head>
+<body>
+
+    <h1>
+        Product Backlog
+    </h1>
+    
+    <div>
+        <input type="submit" value="Add" onclick="addpage()">
+    </div>
+
+    <table>   
+        <tr>
+           <td>PBI</td>
+           <td>story_points</td>
+           <td>status</td>
+        </tr>
+        {% for pbi in pbi_list %}
+        <tr>
+            <td>{{ pbi.card }}</td>
+            <td>{{ pbi.storypoints }}</td>
+            <td>{{ pbi.status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% endfor %}
+        
+   </table>
+
+
+
+
+    
+</body>
+</html>

@@ -1,0 +1,14 @@
+table, tr, td {
+    border: 1px solid black;
+}
+
+table{
+    width:1000px;
+}
+tr{
+    height: 50px;
+}
+
+
+
+
