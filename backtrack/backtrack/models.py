@@ -15,9 +15,9 @@ class Project(models.Model):
     pb=models.ForeignKey(ProductBacklog, on_delete=models.CASCADE)
     create_time=models.DateField(auto_now=False, auto_now_add=True)
 
-class  Teammember(models.Model): 
+class  TeamMember(models.Model): 
     name=models.CharField(max_length=20)
-    email=models.CharField(max_length=30)
+    email=models.EmailField()
     project=models.ForeignKey(Project, on_delete=models.CASCADE)
 
 
