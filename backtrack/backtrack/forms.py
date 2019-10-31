@@ -1,9 +1,9 @@
 from django import forms
-from .models import Pbi
+from .models import PBI
 
-class PbiForm(forms.ModelForm):
+class PBIForm(forms.ModelForm):
     class Meta:
-        model = Pbi
-        fields = ('card', 'conversation', \
+        model = PBI
+        fields = ('title', 'card', 'conversation', \
             'storypoints')
         

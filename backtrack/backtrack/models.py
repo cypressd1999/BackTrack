@@ -18,14 +18,14 @@ class Project(models.Model):
 class  TeamMember(models.Model): 
     name=models.CharField(max_length=20)
     email=models.EmailField()
-    project=models.ForeignKey(Project, on_delete=models.CASCADE)
-
-
 
 class PBI(models.Model):
-    card=models.TextField()
-    conversation=models.CharField(max_length=100)
-    storypoints=models.IntegerField()
+    title=models.CharField(max_length=20, null=True)
+    card=models.TextField(blank=True, null=True)
+    conversation=models.CharField(max_length=100, \
+        blank=True, null=True)
+    storypoints=models.IntegerField(blank=True, null=True)
+    """
     sprintNo=models.IntegerField()
     #define the choices
     inprogress='INP'
@@ -33,6 +33,7 @@ class PBI(models.Model):
     notstart='NO'
     stat=[(inprogress,'in progress'),(completed,'compeleted'),(notstart,'not start')]
     status=models.CharField(choices=stat, max_length=20,default=notstart)
+    """
 
 class Confirmation(models.Model):
     content=models.CharField(max_length=100)

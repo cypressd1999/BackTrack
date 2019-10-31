@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.addpbi, name="addpbi"),
+    path("", views.addPBI, name="addPBI"),
 ]
