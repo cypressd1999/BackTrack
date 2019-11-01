@@ -15,13 +15,13 @@ class ProductOwner(TeamMember):
 
 class Project(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(auto_now_add=True)
     prodcut_owner = models.ForeignKey(
         ProductOwner,
         models.SET_NULL,
         blank=True,
         null=True,
-        )
+    )
 
     def __str__(self):
         return "Project %s" % self.name
@@ -46,7 +46,7 @@ class ProductBacklog(models.Model):
     total_story_points = models.IntegerField(default=0)
     remaining_story_points = models.IntegerField(default=0)
     total_number_of_pbi = models.IntegerField(default=0)
-    project = models.ForeignKey(Project, models.CASCADE)
+    project = models.OneToOneField(Project, models.CASCADE)
 
     def __str__(self):
         return "PB belonging to project %s" % self.project.name
@@ -71,7 +71,9 @@ class PBI(models.Model):
         max_length=20,
         default=NOTSTARTED
     )
-    project = models.ForeignKey(Project, models.CASCADE)
+    product_backlog = models.ForeignKey(
+        ProductBacklog, models.CASCADE
+    )
 
     def __str__(self):
         return "title: %s" % self.title
