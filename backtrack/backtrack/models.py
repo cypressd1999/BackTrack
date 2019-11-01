@@ -1,43 +1,120 @@
 from django.db import models
 
-# Create your models here.
+class TeamMember(models.Model): 
+    name = models.CharField(max_length=25)
+    email = models.EmailField()
 
-class ProductOwner(models.Model):
-    name=models.CharField(max_length=20)
-    email=models.CharField(max_length=30)
+    class Meta:
+        abstract = True
 
-class ProductBacklog(models.Model):
+    def __str__(self):
+        return "name: %s, email: %s" % (self.name, self.email)
+
+class ProductOwner(TeamMember):
     pass
 
 class Project(models.Model):
-    name=models.CharField(max_length=50)
-    owner=models.ForeignKey(ProductOwner,on_delete=models.CASCADE)
-    pb=models.ForeignKey(ProductBacklog, on_delete=models.CASCADE)
-    create_time=models.DateField(auto_now=False, auto_now_add=True)
+    name = models.CharField(primary_key=True, max_length=30)
+    start_time = models.DateTimeField()
+    prodcut_owner = models.ForeignKey(
+        ProductOwner,
+        models.SET_NULL,
+        blank=True,
+        null=True,
+        )
 
-class  TeamMember(models.Model): 
-    name=models.CharField(max_length=20)
-    email=models.EmailField()
+    def __str__(self):
+        return "Project %s" % self.name
+
+class Developer(TeamMember):
+    project = models.ForeignKey(
+        Project,
+        models.SET_NULL,
+        blank=True,
+        null=True
+    )
+
+class ScrumMaster(TeamMember):
+    project = models.ForeignKey(
+        Project,
+        models.SET_NULL,
+        blank=True,
+        null=True
+    )
+
+class ProductBacklog(models.Model):
+    total_story_points = models.IntegerField(default=0)
+    remaining_story_points = models.IntegerField(default=0)
+    total_number_of_pbi = models.IntegerField(default=0)
+    project = models.ForeignKey(Project, models.CASCADE)
+
+    def __str__(self):
+        return "PB belonging to project %s" % self.project.name
 
 class PBI(models.Model):
-    title=models.CharField(max_length=20, null=True)
-    card=models.TextField(blank=True, null=True)
-    conversation=models.CharField(max_length=100, \
-        blank=True, null=True)
-    storypoints=models.IntegerField(blank=True, null=True)
-    """
-    sprintNo=models.IntegerField()
+    title = models.CharField(max_length=20)
+    card = models.TextField(blank=True, null=True)
+    conversation = models.TextField(blank=True, null=True)
+    storypoints = models.IntegerField(blank=True, null=True)
+    priority = models.IntegerField(default=1)
     #define the choices
-    inprogress='INP'
-    completed='CP'
-    notstart='NO'
-    stat=[(inprogress,'in progress'),(completed,'compeleted'),(notstart,'not start')]
-    status=models.CharField(choices=stat, max_length=20,default=notstart)
-    """
+    INPROGRESS = 'INP'
+    FINISHED = 'FN'
+    NOTSTARTED = 'NO'
+    STATUS_CHOICES = [
+        (INPROGRESS, 'in progress'),
+        (FINISHED, 'finished'),
+        (NOTSTARTED, 'not started')
+    ]
+    status = models.CharField(
+        choices=STATUS_CHOICES,
+        max_length=20,
+        default=NOTSTARTED
+    )
+    project = models.ForeignKey(Project, models.CASCADE)
+
+    def __str__(self):
+        return "title: %s" % self.title
+
+    class Meta:
+        ordering = ('priority',)
 
 class Confirmation(models.Model):
-    content=models.CharField(max_length=100)
-    done=models.BooleanField()
-    pbi=models.ForeignKey(PBI, on_delete=models.CASCADE)
+    content = models.CharField(max_length=100)
+    done = models.BooleanField()
+    pbi = models.ForeignKey(PBI, on_delete=models.CASCADE)
 
+class SprintBacklog(models.Model):
+    sprint_number = models.IntegerField()
+    hours_available = models.IntegerField(default=0)
+    remaining_hours = models.FloatField(default=0)
+    pbi = models.ManyToManyField(PBI)
 
+class Task(models.Model):
+    title = models.CharField(max_length=30)
+    description = models.TextField()
+    total_hours = models.FloatField(default=0)
+    finished_hours = models.FloatField(default=0)
+    INPROGRESS = 'INP'
+    FINISHED = 'FN'
+    NOTSTARTED = 'NO'
+    STATUS_CHOICES = [
+        (INPROGRESS, 'in progress'),
+        (FINISHED, 'finished'),
+        (NOTSTARTED, 'not started')
+    ]
+    status = models.CharField(
+        choices=STATUS_CHOICES,
+        max_length=20,
+        default=NOTSTARTED
+    )
+    sprint_backlog = models.ForeignKey(
+        SprintBacklog,
+        models.CASCADE
+    )
+    developer = models.ForeignKey(
+        Developer,
+        models.SET_NULL,
+        blank=True,
+        null=True
+    )
