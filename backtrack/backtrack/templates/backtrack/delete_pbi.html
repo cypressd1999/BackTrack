@@ -1,0 +1,17 @@
+{% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<form action="{% url 'backtrack:delete pbi' project.name %}" \
+    method="POST">
+    {% csrf_token %}
+    {% for pbi in project.productbacklog.pbi_set.all %}
+        <input type="checkbox" name="pbi" \
+            id="pbi{{ forloop.counter }}" \
+            value="{{ pbi.id }}">
+        <label for="pbi{{ forloop.counter }}">
+            {{ pbi.title }}
+        </label><br>
+    {% endfor %}
+<input type="submit" value="delete">
+</form>
