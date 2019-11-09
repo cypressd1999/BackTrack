@@ -1,0 +1,50 @@
+{% load backtrack_extra %}
+<!DOCTYPE html>
+
+<head>
+
+</head>
+<body>
+    <script>
+
+    </script>
+
+    <h1>Product Backlog</h1>
+    <div>
+        <a href="{% url 'backtrack:addPBI' project_name %}">Add a new PBI</a>
+        <a href="{% url 'backtrack:delete pbi' project_name %}">Delete PBI</a>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Story Points</th>
+                <th>Sprint Number</th>
+                <th>Accumulated Story Points</th>
+                <th>Status</th>
+            </tr>
+            {% for pbi in pbi_list %}
+            <tr>
+                <td doubleclick="modifyPBI()">{{ pbi.title }}</td>
+                <td>{{ pbi.storypoints|default_if_none:'Not decided' }}</td>
+                <td>
+                    {% for sb in pbi.sprintbacklog_set.all %}
+                        {% if forloop.last %}
+                            {{ sb.sprint_number }}
+                        {% else %}
+                            {{ sb.sprint_number }},
+                        {% endif %}
+                    {% empty %}
+                        None
+                    {% endfor %}
+                </td>
+                <td>{{ CumStoryPoints|index:forloop.counter }}</td>
+                <td>{{ pbi.status }}</td>
+            </tr>
+            {% empty %}
+                <p>No existing PBIs, please add one</p>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>

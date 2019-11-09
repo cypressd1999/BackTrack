@@ -1,3 +1,12 @@
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
 {% if error_message %}
     <p><strong>{{ error_message }}</strong></p>
 {% endif %}
@@ -13,5 +22,5 @@
             {{ pbi.title }}
         </label><br>
     {% endfor %}
-<input type="submit" value="delete">
+<input type="submit" value="delete" class="btn btn-success">
 </form>

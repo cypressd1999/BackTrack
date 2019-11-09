@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 from django.db.models import Q
 
 from backtrack.models import *
@@ -85,6 +85,7 @@ def deletePBI(request, project_name):
             selected_pbi.delete()
             pb.save()
         return HttpResponse('deleted')
+        #return reverse('backtrack:view pb')
 """
 def createSB(request, project_name):
     project = get_object_or_404(Project, pk=project_name)
@@ -165,3 +166,28 @@ class addTask(CreateView):
     
     def get_success_url(self):
         return reverse('backtrack:create project')
+
+class PBIView(ListView):
+    model = PBI
+    template_name = "backtrack/view_pb.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_name']= self.kwargs.get('project_name')
+        pbi_list = PBI.objects.filter(
+            product_backlog__project__name=\
+                self.kwargs.get('project_name')
+        )
+        CumStoryPoints = [0]
+        inf = False
+        for pbi in pbi_list:
+            if inf:
+                CumStoryPoints.append('inf')
+            elif pbi.storypoints is None:
+                inf = True
+                CumStoryPoints.append('inf')
+            else :
+                CumStoryPoints.append(
+                    CumStoryPoints[-1]+pbi.storypoints
+                )
+        context['CumStoryPoints'] = CumStoryPoints
+        return context
