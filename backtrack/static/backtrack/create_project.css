@@ -1,0 +1,12 @@
+#heading{
+	font-style:italic; 
+	font-weight:bold;
+}
+
+#CreateProjectForm{
+	
+	padding: 10px 10px 10px 10px;
+	
+	border-style:dashed;
+	
+}

@@ -1,0 +1,63 @@
+body{
+	padding: 40px;
+}
+
+#heading{
+	font-style:italic; 
+	font-weight:bold;
+}
+
+#SprintFunctions{
+	
+	
+	padding: 10px 10px 10px 10px;
+	
+	positon:relative;
+	float:right;
+	
+}
+
+.SprintButtons{
+	background-color: #30AED9;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	font-weight: bold;
+	margin: 4px 2px;
+	cursor: pointer;
+	
+}
+
+
+#LastModifiedTime{
+	float:right;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th{
+	height: 40px;
+	
+}
+td{
+	padding: 15px;
+}
+
+
+
+
+
+
+
+

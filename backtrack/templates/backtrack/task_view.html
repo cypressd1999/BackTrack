@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="task_view.css">
+	<!--{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/SprintBcklog.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+</head>
+<body>
+	<div id="heading">
+		<h1>Sprint Backlog</h1>
+	</div>
+
+	<!--div id="DeletePBI">
+		{% if error_message %}
+			<p><strong>{{ error_message }}</strong></p>
+		{% endif %}
+
+		<form action="{% url 'backtrack:delete pbi' project.name %}" \
+			method="POST">
+			{% csrf_token %}
+			{% for pbi in project.productbacklog.pbi_set.all %}
+				<input type="checkbox" name="pbi" \
+					id="pbi{{ forloop.counter }}" \
+					value="{{ pbi.id }}">
+				<label for="pbi{{ forloop.counter }}">
+					{{ pbi.title }}
+				</label><br>
+			{% endfor %}
+			<br>
+			<br>
+			<input type="submit" value="delete">
+		</form>
+	</div-->
+	<div id="SprintFunctions">
+		<h3>Current Sprint Capacity: xxx</h3></nobr>
+		<h3>&nbsp</h3>
+		<input type="button" value="+ Add Task" class="SprintButtons">
+		<input type="button" value="Delete" class="SprintButtons">
+	</div><br><br>
+	
+	
+	
+	<div id="TaskTable">
+	
+		<table>
+			<tr>
+				<th><h2>PBI</h2></th>
+				<th><h3>Story Point</h3></th>
+				<th><h2>TO DO</h2></th>
+				<th><h2>Doing</h2></th>
+				<th><h2>Done</h2></th>
+				<th><h3>Sum of Effect Hours</h3></th>
+				<th><h2>Remaining</h2></th>
+			</tr>
+			<tr>
+				<td>Feature1</td>
+				<td>8</td>
+				<td>
+					<div class="taskInfo">
+						<table><tr><td>TaskToDo1</td></tr><tr><td>8 hr</td></tr></table>
+						<span class="InfoText"><h5>Contributor:</h5><p>xxx</p><h5>Description:</h5><p>this is the task description</p></span>
+					</div><br>
+					<table><tr><td>TaskToDo2</td></tr><tr><td>2 hr</td></tr></table>
+				</td>
+				<td>
+				<table><tr><td>TaskDoing</td></tr><tr><td>2 / 6 hr</td></tr></table>
+				</td>
+				<td>
+					<table><tr><td>TaskDone</td></tr><tr><td>x hr</td></tr></table>
+				</td>
+				<td>30</td>
+				<td>20hr</td>
+			</tr>
+			<tr>
+				<td>Feature2</td>
+				<td>6</td>
+				<td>
+					<table><tr><td>TaskToDo</td></tr><tr><td>8 hr</td></tr></table>
+				</td>
+				<td>
+					<table><tr><td>TaskDoing</td></tr><tr><td>2 / 6 hr</td></tr></table>
+				</td>
+				<td>
+					<table><tr><td>TaskDone</td></tr><tr><td>x hr</td></tr></table>
+				</td>
+				<td>40</td>
+				<td>30hr</td>
+			</tr>
+			<tr>
+				<td>Total Story Point: </td>
+			</tr>
+		</table>
+		
+	</div><br><br><br>
+	
+	<div id="TaskFooter">
+		<!--<input type="button" value="Show Burndown" class="SprintButtons" id="ShowBurndownButton">-->
+		<p id="LastModifiedTime">Last Modified Time: xxxx</p>
+	</div>
+	
+	
+
+</body>
+
+
+</html>

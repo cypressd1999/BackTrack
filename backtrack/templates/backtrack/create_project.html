@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/create_project.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+</head>
+<body>
+	<div id="heading">
+		<h1>Create Project</h1>
+	</div>
+
+	<div id="CreateProjectForm">
+		<form action="" method="post">
+			{% csrf_token %}
+			{{ form }}
+			<input type="submit" value="create project">
+		</form>
+	</div>
+
+</body>
+</html>
+

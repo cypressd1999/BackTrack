@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="sb_view.css">
+	<!--{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/SprintBcklog.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+</head>
+<body>
+	<div id="heading">
+		<h1>Sprint Management</h1>
+	</div>
+
+	<!--div id="DeletePBI">
+		{% if error_message %}
+			<p><strong>{{ error_message }}</strong></p>
+		{% endif %}
+
+		<form action="{% url 'backtrack:delete pbi' project.name %}" \
+			method="POST">
+			{% csrf_token %}
+			{% for pbi in project.productbacklog.pbi_set.all %}
+				<input type="checkbox" name="pbi" \
+					id="pbi{{ forloop.counter }}" \
+					value="{{ pbi.id }}">
+				<label for="pbi{{ forloop.counter }}">
+					{{ pbi.title }}
+				</label><br>
+			{% endfor %}
+			<br>
+			<br>
+			<input type="submit" value="delete">
+		</form>
+	</div-->
+	<div id="SprintFunctions">
+		
+		<h3>&nbsp</h3>
+		<input type="button" value="+ Add Sprint" class="SprintButtons">
+		<input type="button" value="Delete" class="SprintButtons">
+	</div><br><br>
+	
+	
+	
+	<div id="SprintTable">
+	
+		<table>
+			<tr>
+				<th><h2>Sprint</h2></th>
+				<th><h3>In Progress</h3></th>
+				<th><h3>Story Point</h3></th>
+				<th><h2>Capacity</h2></th>
+				
+			</tr>
+			<tr>
+				<td><a href="task_view.html">Sprint1</a></td>
+				<td>No</td>
+				
+				<td>30</td>
+				<td>20hr</td>
+			</tr>
+			<tr>
+				<td><a href="task_view.html">Sprint2</a></td>
+				<td>Yes</td>
+				
+				<td>50</td>
+				<td>40hr</td>
+			</tr>
+			<tr>
+				<td><a href="task_view.html">Sprint3</a></td>
+				<td>No</td>
+				
+				<td>15</td>
+				<td>10hr</td>
+			</tr>
+		</table>
+		
+	</div><br><br><br>
+	
+	<!--<div id="SprintFooter">
+		<!--<input type="button" value="Show Burndown" class="SprintButtons" id="ShowBurndownButton">
+		<p id="LastModifiedTime">Last Modified Time: xxxx</p>
+	</div>-->
+	
+	
+
+</body>
+
+
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/deletepbi.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+</head>
+<body>
+	<div id="heading">
+		<h1>Delete PBI</h1>
+	</div>
+
+	<div id="DeletePBI">
+		{% if error_message %}
+			<p><strong>{{ error_message }}</strong></p>
+		{% endif %}
+
+		<form action="{% url 'backtrack:delete pbi' project.name %}" \
+			method="POST">
+			{% csrf_token %}
+			{% for pbi in project.productbacklog.pbi_set.all %}
+				<input type="checkbox" name="pbi" \
+					id="pbi{{ forloop.counter }}" \
+					value="{{ pbi.id }}">
+				<label for="pbi{{ forloop.counter }}">
+					{{ pbi.title }}
+				</label><br>
+			{% endfor %}
+			<br>
+			<br>
+			<input type="submit" value="delete">
+		</form>
+	</div>
+	
+	
+
+</body>
+</html>
