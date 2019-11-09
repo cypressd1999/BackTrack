@@ -139,4 +139,29 @@ class createSB(CreateView):
     def get_success_url(self):
         return reverse('backtrack:create project')
 
-#class createTask(CreateView):
+class addTask(CreateView):
+    form_class = TaskForm
+    template_name = 'backtrack/addtask.html'
+    current_sprint = None
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        self.current_sprint = SprintBacklog.objects.filter(
+                Q(is_current_sprint=True),
+                Q(pbi__product_backlog__project__name=\
+                    self.kwargs.get('project_name'))
+            )[0]
+        kwargs.update({
+            'sprint_backlog': self.current_sprint
+        })
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.sprint_backlog = self.current_sprint
+        self.current_sprint.remaining_hours += \
+            form.instance.total_hours
+        self.current_sprint.save()
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('backtrack:create project')

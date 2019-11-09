@@ -29,3 +29,6 @@ class PBIAdmin(admin.ModelAdmin):
 
 class SBAdmin(admin.ModelAdmin):
     admin.site.register(SprintBacklog)
+
+class TaskAdmin(admin.ModelAdmin):
+    admin.site.register(Task)

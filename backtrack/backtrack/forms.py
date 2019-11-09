@@ -28,7 +28,7 @@ class SBForm(forms.ModelForm):
                 PBI.objects.filter(
                     product_backlog__project__name=\
                         self.project_name
-                ).filter(status=PBI.NOTSTARTED)
+                ).exclude(status=PBI.FINISHED)
 
     class Meta:
         model = SprintBacklog
@@ -39,12 +39,21 @@ class SBForm(forms.ModelForm):
         widgets = {
             'pbi': forms.CheckboxSelectMultiple
         }
-'''
+
 class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-
+        try:
+            self.sprintbacklog = kwargs.pop('sprint_backlog')
+        except KeyError:
+            super().__init__(*args, **kwargs)
+        else:
+            super().__init__(*args, **kwargs)
+            self.fields['pbi'].queryset = \
+                PBI.objects.filter(
+                    sprintbacklog=\
+                        self.sprintbacklog
+                )
 
     class Meta:
-        models = Task
-        fields = ('title', 'description', 'total_hours')
-'''
+        model = Task
+        fields = ('title', 'description', 'total_hours', 'pbi')

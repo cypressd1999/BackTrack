@@ -115,6 +115,7 @@ class Task(models.Model):
         SprintBacklog,
         models.CASCADE
     )
+    pbi = models.ForeignKey(PBI, models.CASCADE)
     developer = models.ForeignKey(
         Developer,
         models.SET_NULL,
