@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Project, ProductBacklog, PBI
+from .models import *
 
 class ProjectAdmin(admin.ModelAdmin):
     admin.site.register(Project)
@@ -26,3 +26,6 @@ class PBIAdmin(admin.ModelAdmin):
         'status',
         'product_backlog'
     )
+
+class SBAdmin(admin.ModelAdmin):
+    admin.site.register(SprintBacklog)

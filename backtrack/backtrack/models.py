@@ -91,6 +91,7 @@ class SprintBacklog(models.Model):
     hours_available = models.IntegerField(default=0)
     remaining_hours = models.FloatField(default=0)
     pbi = models.ManyToManyField(PBI)
+    is_current_sprint = models.BooleanField(default=False)
 
 class Task(models.Model):
     title = models.CharField(max_length=30)
