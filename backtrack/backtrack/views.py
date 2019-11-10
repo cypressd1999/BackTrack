@@ -266,3 +266,35 @@ class TaskView(ListView, SingleObjectMixin):
                     
     def get_queryset(self):
         return self.object.pbi.all()
+        return HttpResponse('deleted')
+    
+    #the view for modify PBI, can modiry its title, card, conversation, storypoints and orders
+def modifyPBI(request, project_name, pbi_title):
+    pbi_modifying=get_object_or_404(models.PBI, title=pbi_title)
+    PB=pbi_modifying.product_backlog
+    if pbi_modifying.status != models.PBI.NOTSTARTED:
+        #do something to save
+        pass
+    form = PBIForm(request.POST, initial={'title':pbi_modifying.title,'card':pbi_modifying.card,'conversation':pbi_modifying.conversation, 'storypoints':pbi_modifying.storypoints})
+    if request.method == 'POST':
+        if form.is_valid():
+            if form.cleaned_data['title']:
+                pbi_modifying.title=form.cleaned_data['title']
+            if form.cleaned_data['card']:
+                pbi_modifying.card=form.cleaned_data['card']
+            if form.cleaned_data['conversation']:
+                pbi_modifying.conversation=form.cleaned_data['conversation']
+            if form.cleaned_data['storypoints']:
+                PB.total_story_points=PB.total_story_points - pbi_modifying.storypoints + form.cleaned_data['storypoints']
+                PB.remaining_story_points=PB.remaining_story_points - pbi_modifying.storypoints + form.cleaned_data['storypoints']
+                pbi_modifying.storypoints=form.cleaned_data['storypoints']
+                PB.save()
+            pbi_modifying.save()
+        return HttpResponse('modified')
+        #HttpResponseRedirect(reverse('prodcut backlog', kwargs={'project_name': PB.project.name}))
+    else:
+        return render(
+            request,
+            "backtrack/modifypbi.html",
+            {"form": form}
+        )

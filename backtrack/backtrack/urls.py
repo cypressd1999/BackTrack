@@ -10,5 +10,7 @@ urlpatterns = [
     path("<project_name>/add_task", views.AddTask.as_view(), name="add task"),
     path("<project_name>/view_pb", views.PBIView.as_view(), name="view pb"),
     path("<project_name>/view_sb", views.SBView.as_view(), name="view sb"),
-    path("<int:pk>/view_task", views.TaskView.as_view(), name="view task")
+    path("<int:pk>/view_task", views.TaskView.as_view(), name="view task"),
+    path("<project_name>/<pbi_title>",views.modifyPBI, name="modify pbi"),
+    
 ]
