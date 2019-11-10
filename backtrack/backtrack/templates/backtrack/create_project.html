@@ -1,5 +1,14 @@
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
 <form action="" method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="create project">
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-success">Create</button>
 </form>

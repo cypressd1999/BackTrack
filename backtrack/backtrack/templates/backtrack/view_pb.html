@@ -1,4 +1,13 @@
 {% load backtrack_extra %}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
 <!DOCTYPE html>
 
 <head>
@@ -11,18 +20,30 @@
 
     <h1>Product Backlog</h1>
     <div>
-        <a href="{% url 'backtrack:addPBI' project_name %}">Add a new PBI</a>
-        <a href="{% url 'backtrack:delete pbi' project_name %}">Delete PBI</a>
+        <a class="btn btn-primary" role="button"
+         href="{% url 'backtrack:add pbi' project_name %}">
+         Add PBI</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:delete pbi' project_name %}">
+        Delete PBI</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:create sb' project_name %}">
+        Create Sprint</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:view sb' project_name %}">
+        View Sprints</a>
     </div>
     <div>
-        <table>
-            <tr>
-                <th>Item</th>
-                <th>Story Points</th>
-                <th>Sprint Number</th>
-                <th>Accumulated Story Points</th>
-                <th>Status</th>
-            </tr>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Story Points</th>
+                    <th scope="col">Sprint Number</th>
+                    <th scope="col">Accumulated Story Points</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
             {% for pbi in pbi_list %}
             <tr>
                 <td doubleclick="modifyPBI()">{{ pbi.title }}</td>

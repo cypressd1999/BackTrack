@@ -1,0 +1,71 @@
+{% load backtrack_extra %}
+{% load backtrack_extra %}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="../../static/backtrack/sb_view.css">
+	<!--{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/SprintBcklog.css' %}">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+</head>
+<body>
+	<div id="heading">
+		<h1>Sprint Management</h1>
+	</div>
+
+	<div id="SprintFunctions">
+		
+		<h3>&nbsp</h3>
+		<a class="btn btn-primary btn-lg" 
+				href="{% url 'backtrack:create sb' project_name %}" 
+				role="button">Create a new sprint</a>
+		<a class="btn btn-primary btn-lg" 
+			href="{% url 'backtrack:view pb' project_name %}" 
+			role="button">View Product Backlog</a>
+	</div><br><br>
+	
+	
+	
+	<div id="SprintTable">
+	
+		<table class="table table-striped table-bordered">
+			<thead class="thead-dark">
+				<tr>
+					<th scope="col"><h2>Sprint</h2></th>
+					<th scope="col"><h3>Story Points</h3></th>
+					<th scope="col"><h2>Capacity</h2></th>
+				</tr>
+			</thead>
+			{% for sb in sprintbacklog_list %}
+			<tr>
+				<td><a href="{% url 'backtrack:view task' sb.id %}">
+					Sprint{{ sb.sprint_number }}
+				</a></td>
+				
+				<td>{{ storypoints_list|index:forloop.counter0 }}</td>
+				<td>{{ sb.hours_available }}hr</td>
+			</tr>
+			{% empty %}
+				No sprint now.
+			{% endfor %}
+		</table>
+		
+	</div><br><br><br>
+
+</body>
+
+
+</html>

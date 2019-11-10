@@ -1,52 +1,48 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import CreateView, ListView
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView, DeleteView, \
+    UpdateView
+from django.views.generic.detail import SingleObjectMixin
 from django.db.models import Q
 
 from backtrack.models import *
 from backtrack.forms import *
 
-def addPBI(request, project_name):
-    form = PBIForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            new_pbi = form.save(commit=False)
-            project = get_object_or_404(
-                Project,
-                name=project_name
-            )
-            pb = get_object_or_404(
-                ProductBacklog,
-                project=project
-            )
-            new_pbi.product_backlog = pb
-            if new_pbi.storypoints:
-                pb.total_story_points += new_pbi.storypoints
-                pb.remaining_story_points += new_pbi.storypoints
-                pb.save()
-            new_pbi.save()
-            return HttpResponse("pbi saved")
-    else:
-        return render(request, "backtrack/addpbi.html", \
-            {"form": form})
+class AddPBI(CreateView):
+    form_class = PBIForm
+    template_name = "backtrack/addpbi.html"
 
-def createProject(request):
-    form = CreateProjectForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            new_project = form.save()
-            new_pb = ProductBacklog.objects.create(
-                project=new_project
-            )
-            new_pb.save()
-            return HttpResponse("project saved")
-    else:
-        return render(
-            request,
-            "backtrack/create_project.html",
-            {"form": form}
+    def form_valid(self, form):
+        project = get_object_or_404(
+                Project,
+                name=self.kwargs.get('project_name')
         )
+        new_pbi = form.save(commit=False)
+        pb = ProductBacklog.objects.get(
+            project=self.kwargs.get('project_name')
+        )
+        new_pbi.product_backlog = pb
+        if new_pbi.storypoints:
+            pb.total_story_points += new_pbi.storypoints
+            pb.remaining_story_points += new_pbi.storypoints
+            pb.save()
+        new_pbi.save()
+        return super().form_valid(form)
+
+class CreateProject(CreateView):
+    model = Project
+    fields = ['name']
+    template_name = 'backtrack/create_project.html'
+
+    def form_valid(self, form):
+        form.save()
+        new_pb = ProductBacklog.objects.create(
+                project=form.instance
+            )
+        new_pb.save()
+        return super().form_valid(form)
 
 def deletePBI(request, project_name):
     project = get_object_or_404(Project, pk=project_name)
@@ -72,7 +68,9 @@ def deletePBI(request, project_name):
     else:
         for selected_pbi in selected_pbis:
             if selected_pbi.status != PBI.NOTSTARTED:
-                return render(request,'backtrack/delete_pbi.html',
+                return render(
+                    request,
+                    'backtrack/delete_pbi.html',
                     {'project': project,
                     'error_message':\
                         "You cannot delete a started pbi"
@@ -84,32 +82,20 @@ def deletePBI(request, project_name):
                     selected_pbi.storypoints
             selected_pbi.delete()
             pb.save()
-        return HttpResponse('deleted')
-        #return reverse('backtrack:view pb')
-"""
-def createSB(request, project_name):
-    project = get_object_or_404(Project, pk=project_name)
-    form = SBForm(
-        request.POST or None,
-        project_name=project_name
-    )
-    if request.method == 'POST':
-        if form.is_valid():
-            sb = form.save(commit=False)
-            sb.sprint_number = 1
-            sb.save()
-            form.save_m2m()
-            return HttpResponse("save fine")
-    else:
-        return render(
-            request,
-            "backtrack/create_sb.html",
-            {"form": form}
+        return HttpResponseRedirect(
+            reverse('backtrack:view pb', 
+            kwargs={'project_name': project_name})
         )
-"""
-class createSB(CreateView):
+
+class CreateSB(CreateView):
     form_class = SBForm
     template_name = "backtrack/create_sb.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_name'] = \
+            self.kwargs.get('project_name')
+        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -137,21 +123,22 @@ class createSB(CreateView):
             last_sprint.save()
         return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse('backtrack:create project')
 
-class addTask(CreateView):
+class AddTask(CreateView):
     form_class = TaskForm
     template_name = 'backtrack/addtask.html'
     current_sprint = None
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+    def dispatch(self, request, *args, **kwargs):
         self.current_sprint = SprintBacklog.objects.filter(
                 Q(is_current_sprint=True),
                 Q(pbi__product_backlog__project__name=\
-                    self.kwargs.get('project_name'))
+                    kwargs.get('project_name'))
             )[0]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'sprint_backlog': self.current_sprint
         })
@@ -163,20 +150,22 @@ class addTask(CreateView):
             form.instance.total_hours
         self.current_sprint.save()
         return super().form_valid(form)
-    
-    def get_success_url(self):
-        return reverse('backtrack:create project')
+
 
 class PBIView(ListView):
     model = PBI
     template_name = "backtrack/view_pb.html"
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['project_name']= self.kwargs.get('project_name')
-        pbi_list = PBI.objects.filter(
+
+    def get_queryset(self):
+        return PBI.objects.filter(
             product_backlog__project__name=\
                 self.kwargs.get('project_name')
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_name']= self.kwargs.get('project_name')
+        pbi_list = self.get_queryset()
         CumStoryPoints = [0]
         inf = False
         for pbi in pbi_list:
@@ -191,3 +180,89 @@ class PBIView(ListView):
                 )
         context['CumStoryPoints'] = CumStoryPoints
         return context
+
+class SBView(ListView):
+    model = SprintBacklog
+    template_name = "backtrack/sb_view.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_name']= self.kwargs.get('project_name')
+        sprintbacklog_list = SprintBacklog.objects.filter(
+            pbi__product_backlog__project__name=\
+                self.kwargs.get('project_name')
+        ).distinct().order_by('sprint_number')
+        storypoints_list = []
+        for sb in sprintbacklog_list:
+            s = 0
+            for pbi in sb.pbi.all():
+                if pbi.storypoints is None:
+                    s = 'Not decided'
+                    break
+                else:
+                    s += pbi.storypoints
+            storypoints_list.append(s)
+        context['sprintbacklog_list'] = sprintbacklog_list
+        context['storypoints_list'] = storypoints_list
+        return context
+
+class TaskView(ListView, SingleObjectMixin):
+    template_name = "backtrack/task_view.html"
+
+    class RowData:
+        def __init__(self, pbi, task_category, 
+                finished_hours, total_hours):
+            self.pbi = pbi
+            self.task_category = task_category
+            self.finished_hours = finished_hours
+            self.total_hours = total_hours
+            self.remaining_hours = total_hours - finished_hours
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(
+                queryset=SprintBacklog.objects.all()
+            )
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pbi_list = self.get_queryset()
+        row_data_list = []
+        total_storypoints = 0; inf = False
+        for pbi in pbi_list:
+            if not inf:
+                if pbi.storypoints is None:
+                    inf = True
+                    total_storypoints = 'inf'
+                else:
+                    total_storypoints += pbi.storypoints
+            task_no = []; task_inp = []; task_fn = []
+            finished_hours = 0
+            total_hours = 0
+            for task in pbi.task_set.all():
+                if task.sprint_backlog.id != self.object.id:
+                    continue
+                if task.status == Task.NOTSTARTED:
+                    task_no.append(task)
+                elif task.status == Task.INPROGRESS:
+                    task_inp.append(task)
+                elif task.status == Task.FINISHED:
+                    task_fn.append(task)
+                finished_hours += task.finished_hours
+                total_hours += task.total_hours
+            task_category = [task_no, task_inp, task_fn]
+            row_data_list.append(
+                self.RowData(
+                    pbi,task_category,
+                    finished_hours, total_hours
+                )
+            )
+        context['sb'] = self.object
+        context['row_data_list'] = row_data_list
+        context['total_storypoints'] = total_storypoints
+        context['hours_available'] = self.object.hours_available
+        context['project_name'] = \
+            self.object.pbi.all()[0].product_backlog.project.name
+        return context
+                    
+    def get_queryset(self):
+        return self.object.pbi.all()

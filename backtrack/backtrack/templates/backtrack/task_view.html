@@ -1,0 +1,92 @@
+{% load backtrack_extra %}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="../../static/backtrack/task_view.css">
+
+</head>
+<body>
+	<div id="heading">
+		<h1>Sprint Backlog</h1>
+	</div>
+
+	<div id="SprintFunctions">
+		<h3>Current Sprint Capacity: {{ hours_available }}</h3></nobr>
+		<h3>&nbsp</h3>
+		<a class="btn btn-primary btn-lg" 
+				href="{% url 'backtrack:view sb' project_name %}" 
+				role="button">View SprintBacklog</a>
+		{% if sb.is_current_sprint %}
+			<a class="btn btn-primary btn-lg" 
+				href="{% url 'backtrack:add task' project_name %}" 
+				role="button">Add task</a>
+		{% endif %}
+	</div><br><br>
+	
+	
+	
+	<div id="TaskTable">
+	
+		<table>
+			<tr>
+				<th><h2>PBI</h2></th>
+				<th><h3>Story Point</h3></th>
+				<th><h2>TO DO</h2></th>
+				<th><h2>Doing</h2></th>
+				<th><h2>Done</h2></th>
+				<th><h3>Finished Hours</h3></th>
+				<th><h2>Remaining Hours</h2></th>
+				<th><h2>Total Hours</h2></th>
+			</tr>
+			{% for row_data in row_data_list %}
+			<tr>
+				<td>{{ row_data.pbi.title }}</td>
+				<td>{{ row_data.pbi.storypoints|default_if_none:'inf' }}</td>
+				{% for category in row_data.task_category %}
+				<td>
+					{% for task in category %}
+					<div class="taskInfo">
+						<table>
+							<tr><td>{{ task.title }}</td></tr>
+							<tr><td>{{ task.finished_hours }}hr / {{ task.total_hours }}hr</td></tr>
+						</table>
+						<span class="InfoText">
+							<h5>Contributor:</h5><p>{{ task.developer|default_if_none:'' }}</p>
+							<h5>Description:</h5><p>{{ task.description }}</p>
+						</span>
+					</div><br>
+					{% empty %}
+					{% endfor %}
+				</td>
+				{% endfor %}
+				<td>{{ row_data.finished_hours }}</td>
+				<td>{{ row_data.remaining_hours }}</td>
+				<td>{{ row_data.total_hours }}</td>
+			{% empty %}
+				You didn't add any pbi to this sprint
+			{% endfor %}
+			<tr>
+				<td>Total Story Point: </td>
+				<td>{{ total_storypoints }}</td>
+			</tr>
+		</table>
+		
+	</div><br><br><br>	
+
+</body>
+
+
+</html>

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class TeamMember(models.Model): 
     name = models.CharField(max_length=25)
@@ -25,6 +26,11 @@ class Project(models.Model):
 
     def __str__(self):
         return "Project %s" % self.name
+
+    def get_absolute_url(self):
+        return reverse('backtrack:view pb',
+            kwargs={'project_name': self.name}
+        )
 
 class Developer(TeamMember):
     project = models.ForeignKey(
@@ -78,6 +84,13 @@ class PBI(models.Model):
     def __str__(self):
         return "title: %s" % self.title
 
+    def get_absolute_url(self):
+        return reverse('backtrack:view pb',
+            kwargs={
+            'project_name': self.product_backlog.project.name
+            }
+        )
+
     class Meta:
         ordering = ('priority',)
 
@@ -92,6 +105,13 @@ class SprintBacklog(models.Model):
     remaining_hours = models.FloatField(default=0)
     pbi = models.ManyToManyField(PBI)
     is_current_sprint = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('backtrack:view sb',
+            kwargs={
+            'project_name': self.pbi.all()[0].product_backlog.project.name
+        }
+        )
 
 class Task(models.Model):
     title = models.CharField(max_length=30)
@@ -122,3 +142,8 @@ class Task(models.Model):
         blank=True,
         null=True
     )
+
+    def get_absolute_url(self):
+        return reverse('backtrack:view task',
+            kwargs={'pk': self.sprint_backlog.id}
+        )
