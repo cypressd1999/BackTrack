@@ -6,5 +6,6 @@ urlpatterns = [
     path("<project_name>/addpbi", views.addPBI, name="addPBI"),
     path("create_project", views.createProject, name="create project"),
     path("<project_name>/deletepbi", views.deletePBI, name="delete pbi"),
+    path("<project_name>/<pbi_title>",views.modifyPBI, name="modify pbi"),
     
 ]
