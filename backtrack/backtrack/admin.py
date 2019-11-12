@@ -32,3 +32,6 @@ class SBAdmin(admin.ModelAdmin):
 
 class TaskAdmin(admin.ModelAdmin):
     admin.site.register(Task)
+
+class ConfirmationAdmin(admin.ModelAdmin):
+    admin.site.register(Confirmation)

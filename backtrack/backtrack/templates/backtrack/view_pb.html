@@ -46,7 +46,8 @@
             </thead>
             {% for pbi in pbi_list %}
             <tr>
-                <td doubleclick="modifyPBI()">{{ pbi.title }}</td>
+                <td><a href="{% url 'backtrack:view pbi' pbi.pk %}">
+                    {{ pbi.title }}</a></td>
                 <td>{{ pbi.storypoints|default_if_none:'Not decided' }}</td>
                 <td>
                     {% for sb in pbi.sprintbacklog_set.all %}

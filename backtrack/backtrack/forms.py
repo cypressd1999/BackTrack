@@ -7,6 +7,10 @@ class PBIForm(forms.ModelForm):
         fields = ('title', 'card', 'conversation', \
             'storypoints', 'priority')
 
+PBIFormSet = forms.inlineformset_factory(
+    PBI, Confirmation, fields=('content', 'done')
+)
+
 class CreateProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -57,3 +61,8 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ('title', 'description', 'total_hours', 'pbi')
+
+class ConfirmationForm(forms.ModelForm):
+    class Meta:
+        model = Confirmation
+        fields = ('content', 'done')

@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, \
     UpdateView
 from django.views.generic.detail import SingleObjectMixin
@@ -77,7 +77,8 @@ def deletePBI(request, project_name):
                     }
                 )
             if selected_pbi.storypoints:
-                pb.total_story_points -= selected_pbi.storypoints
+                pb.total_story_points -= \
+                    selected_pbi.storypoints
                 pb.remaining_story_points -= \
                     selected_pbi.storypoints
             selected_pbi.delete()
@@ -152,7 +153,7 @@ class AddTask(CreateView):
         return super().form_valid(form)
 
 
-class PBIView(ListView):
+class PBView(ListView):
     model = PBI
     template_name = "backtrack/view_pb.html"
 
@@ -266,35 +267,87 @@ class TaskView(ListView, SingleObjectMixin):
                     
     def get_queryset(self):
         return self.object.pbi.all()
-        return HttpResponse('deleted')
-    
-    #the view for modify PBI, can modiry its title, card, conversation, storypoints and orders
-def modifyPBI(request, project_name, pbi_title):
-    pbi_modifying=get_object_or_404(models.PBI, title=pbi_title)
-    PB=pbi_modifying.product_backlog
-    if pbi_modifying.status != models.PBI.NOTSTARTED:
-        #do something to save
-        pass
-    form = PBIForm(request.POST, initial={'title':pbi_modifying.title,'card':pbi_modifying.card,'conversation':pbi_modifying.conversation, 'storypoints':pbi_modifying.storypoints})
-    if request.method == 'POST':
-        if form.is_valid():
-            if form.cleaned_data['title']:
-                pbi_modifying.title=form.cleaned_data['title']
-            if form.cleaned_data['card']:
-                pbi_modifying.card=form.cleaned_data['card']
-            if form.cleaned_data['conversation']:
-                pbi_modifying.conversation=form.cleaned_data['conversation']
-            if form.cleaned_data['storypoints']:
-                PB.total_story_points=PB.total_story_points - pbi_modifying.storypoints + form.cleaned_data['storypoints']
-                PB.remaining_story_points=PB.remaining_story_points - pbi_modifying.storypoints + form.cleaned_data['storypoints']
-                pbi_modifying.storypoints=form.cleaned_data['storypoints']
-                PB.save()
-            pbi_modifying.save()
-        return HttpResponse('modified')
-        #HttpResponseRedirect(reverse('prodcut backlog', kwargs={'project_name': PB.project.name}))
-    else:
-        return render(
-            request,
-            "backtrack/modifypbi.html",
-            {"form": form}
+
+class ViewPBI(ListView, SingleObjectMixin):
+    template_name = 'backtrack/view_pbi.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(
+            queryset=PBI.objects.all()
         )
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, *kwargs):
+        context = super().get_context_data(*kwargs)
+        context['pbi'] = self.object
+        context['confirmation_list'] = self.get_queryset()
+        context['project_name'] = \
+            self.object.product_backlog.project.name
+        context['pk'] = self.object.pk
+        return context
+        
+    def get_queryset(self):
+        return self.object.confirmation_set.all()
+
+class ModifyPBI(UpdateView):
+    model = PBI
+    form_class = PBIForm
+    template_name = "backtrack/modify_pbi.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        confirmation_form = PBIFormSet(instance=self.object)
+        return self.render_to_response(
+            self.get_context_data(
+                form=form,
+                confirmation_form=confirmation_form
+            )
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        confirmation_form = PBIFormSet(
+            instance=self.object, 
+            data=request.POST
+        )
+        if form.is_valid() and confirmation_form.is_valid():
+            return self.form_valid(form, confirmation_form)
+        else:
+            return self.form_invalid(form, confirmation_form)
+    
+    def form_valid(self, form, confirmation_form):
+        if form.has_changed():
+            print('form has changed')
+            if form.instance.storypoints:
+                pb = self.object.product_backlog
+                pb.remaining_story_points = \
+                    pb.remaining_story_points - \
+                        self.object.storypoints \
+                        + form.instance.storypoints
+                pb.total_story_points = \
+                    pb.total_story_points - \
+                        self.object.storypoints \
+                        + form.instance.storypoints
+                pb.save()
+            form.save()
+        if confirmation_form.has_changed():
+            confirmation_form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, confirmation_form):
+        return self.render_to_response(self.get_context_data(
+            form=form, confirmation_form=confirmation_form
+        ))
+
+class AddConfirmation(CreateView):
+    template_name = 'backtrack/confirmation_form.html'
+    form_class = ConfirmationForm
+
+    def form_valid(self, form):
+        pbi = PBI.objects.get(pk=self.kwargs.get('pk'))
+        form.instance.pbi = pbi
+        return super().form_valid(form)

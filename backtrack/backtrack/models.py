@@ -99,6 +99,11 @@ class Confirmation(models.Model):
     done = models.BooleanField()
     pbi = models.ForeignKey(PBI, on_delete=models.CASCADE)
 
+    def get_absolute_url(self):
+        return reverse('backtrack:view pbi', kwargs={
+            'pk': self.pbi.pk
+        })
+
 class SprintBacklog(models.Model):
     sprint_number = models.IntegerField()
     hours_available = models.IntegerField(default=0)

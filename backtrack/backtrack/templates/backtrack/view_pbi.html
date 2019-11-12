@@ -1,0 +1,66 @@
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<a class="btn btn-primary" 
+	href="{% url 'backtrack:modify pbi' pk %}" 
+    role="button">Modify</a>
+<a class="btn btn-primary"
+    href="{% url 'backtrack:add confirmation' pk %}" 
+    role="button">Add Confirmation</a>
+<p>
+    <label>title:</label>
+        {{ pbi.title }}
+</p>
+<p>
+    <label>card:</label>
+        {{ pbi.card }}
+</p>
+<p>
+    <label>conversation:</label>
+        {{ pbi.conversation }}
+</p>
+<p>
+    <label>story points:</label>
+        {{ pbi.storypoints|default_if_none:'inf' }}
+</p>
+<p>
+    <label>priority:</label>
+        {{ pbi.priority }}
+</p>
+<p>
+    <label>status:</label>
+        {{ pbi.status }}
+</p>
+
+<p>done:</p>
+<div>
+<ul>
+    {% for confirmation in confirmation_list %}
+        {% if confirmation.done %}
+            <li>
+                {{ confirmation.content }}
+            </li>
+        {% endif %}
+    {% empty %}
+    {% endfor %}
+</ul>
+</div>
+
+<p>not done:</p>
+<div>
+<ul>
+    {% for confirmation in confirmation_list %}
+        {% if not confirmation.done %}
+            <li>
+                {{ confirmation.content }}
+            </li>
+        {% endif %}
+    {% empty %}
+    {% endfor %}
+</ul>
+</div>
