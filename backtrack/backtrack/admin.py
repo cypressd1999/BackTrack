@@ -1,6 +1,24 @@
 from django.contrib import admin
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 from .models import *
+
+class ProductOwnerInline(admin.StackedInline):
+    model = ProductOwner
+    verbose_name_plural = "product owner"
+
+class DeveloperInline(admin.StackedInline):
+    model = Developer
+    verbose_name_plural = "developer"
+
+class ScrumMasterInline(admin.StackedInline):
+    model = ScrumMaster
+    verbose_name_plural = "scrum master"
+
+class UserAdmin(BaseUserAdmin):
+    inlines = (ProductOwnerInline, DeveloperInline, ScrumMasterInline)
+
+admin.site.register(User, UserAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
     admin.site.register(Project)

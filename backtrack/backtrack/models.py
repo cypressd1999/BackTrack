@@ -1,18 +1,14 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
-class TeamMember(models.Model): 
-    name = models.CharField(max_length=25)
-    email = models.EmailField()
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return "name: %s, email: %s" % (self.name, self.email)
-
-class ProductOwner(TeamMember):
+class User(AbstractUser):
     pass
+
+class ProductOwner(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, models.CASCADE)
 
 class Project(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
@@ -32,7 +28,9 @@ class Project(models.Model):
             kwargs={'project_name': self.name}
         )
 
-class Developer(TeamMember):
+class Developer(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, models.CASCADE)
     project = models.ForeignKey(
         Project,
         models.SET_NULL,
@@ -40,7 +38,9 @@ class Developer(TeamMember):
         null=True
     )
 
-class ScrumMaster(TeamMember):
+class ScrumMaster(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, models.CASCADE)
     project = models.ForeignKey(
         Project,
         models.SET_NULL,
