@@ -2,9 +2,24 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.db.models.signals import post_save
 
 class User(AbstractUser):
-    pass
+    PRODUCTOWNER = 'PO'
+    DEVELOPER = 'DEV'
+    SCRUMMASTER = 'SM'
+    ADMIN = 'ADMIN'
+    ROLE_CHOICES = [
+        (PRODUCTOWNER, 'product owner'),
+        (DEVELOPER, 'developer'),
+        (SCRUMMASTER, 'scrum master'),
+        (ADMIN, 'administrator')
+    ]
+    role = models.CharField(
+        choices=ROLE_CHOICES,
+        max_length=20,
+        default=ADMIN
+    )
 
 class ProductOwner(models.Model):
     user = models.OneToOneField(
@@ -13,7 +28,7 @@ class ProductOwner(models.Model):
 class Project(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
     start_time = models.DateTimeField(auto_now_add=True)
-    prodcut_owner = models.ForeignKey(
+    product_owner = models.ForeignKey(
         ProductOwner,
         models.SET_NULL,
         blank=True,
@@ -152,3 +167,15 @@ class Task(models.Model):
         return reverse('backtrack:view task',
             kwargs={'pk': self.sprint_backlog.id}
         )
+
+def user_post_save_receiver(sender, instance, created, **kwargs):
+    if created:
+        if instance.role == User.DEVELOPER:
+            Developer.objects.create(user=instance)
+        elif instance.role == User.PRODUCTOWNER:
+            ProductOwner.objects.create(user=instance)
+        elif instance.role == User.SCRUMMASTER:
+            ScrumMaster.objects.create(user=instance)
+
+post_save.connect(user_post_save_receiver,
+    sender=settings.AUTH_USER_MODEL)

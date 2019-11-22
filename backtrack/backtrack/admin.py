@@ -17,6 +17,12 @@ class ScrumMasterInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = (ProductOwnerInline, DeveloperInline, ScrumMasterInline)
+    fieldsets = BaseUserAdmin.fieldsets + (
+        (None, {'fields': ('role',)}),
+    )
+    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+        (None, {'fields': ('role',)}),
+    )
 
 admin.site.register(User, UserAdmin)
 
