@@ -1,10 +1,11 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, \
     UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
 
 from backtrack.models import *
@@ -351,3 +352,10 @@ class AddConfirmation(CreateView):
         pbi = PBI.objects.get(pk=self.kwargs.get('pk'))
         form.instance.pbi = pbi
         return super().form_valid(form)
+
+class LoginView(LoginView):
+    template_name = 'backtrack/login.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['next'] = reverse('backtrack:create project')
+        return context
