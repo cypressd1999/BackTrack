@@ -62,6 +62,20 @@ class TaskForm(forms.ModelForm):
         model = Task
         fields = ('title', 'description', 'total_hours', 'pbi')
 
+class UpdateTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ('title', 'description', \
+            'total_hours', 'finished_hours')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        finished_hours = cleaned_data.get('finished_hours')
+        total_hours = cleaned_data.get('total_hours')
+        if finished_hours > total_hours:
+            raise forms.ValidationError("The finished hours \
+                exceeds the total hours!")
+
 class ConfirmationForm(forms.ModelForm):
     class Meta:
         model = Confirmation

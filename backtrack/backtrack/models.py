@@ -25,6 +25,9 @@ class ProductOwner(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, models.CASCADE)
 
+    def __str__(self):
+        return self.user.username
+
 class Project(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
     start_time = models.DateTimeField(auto_now_add=True)
@@ -53,6 +56,9 @@ class Developer(models.Model):
         null=True
     )
 
+    def __str__(self):
+        return self.user.username
+
 class ScrumMaster(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, models.CASCADE)
@@ -62,6 +68,9 @@ class ScrumMaster(models.Model):
         blank=True,
         null=True
     )
+
+    def __str__(self):
+        return self.user.username
 
 class ProductBacklog(models.Model):
     total_story_points = models.IntegerField(default=0)
@@ -97,7 +106,7 @@ class PBI(models.Model):
     )
 
     def __str__(self):
-        return "title: %s" % self.title
+        return self.title
 
     def get_absolute_url(self):
         return reverse('backtrack:view pb',
@@ -125,11 +134,25 @@ class SprintBacklog(models.Model):
     remaining_hours = models.FloatField(default=0)
     pbi = models.ManyToManyField(PBI)
     is_current_sprint = models.BooleanField(default=False)
+    INPROGRESS = 'INP'
+    FINISHED = 'FN'
+    NOTSTARTED = 'NO'
+    STATUS_CHOICES = [
+        (INPROGRESS, 'in progress'),
+        (FINISHED, 'finished'),
+        (NOTSTARTED, 'not started')
+    ]
+    status = models.CharField(
+        choices=STATUS_CHOICES,
+        max_length=20,
+        default=NOTSTARTED
+    )
 
     def get_absolute_url(self):
         return reverse('backtrack:view sb',
             kwargs={
-            'project_name': self.pbi.all()[0].product_backlog.project.name
+            'project_name': \
+                self.pbi.all()[0].product_backlog.project.name
         }
         )
 
