@@ -73,9 +73,6 @@ class ScrumMaster(models.Model):
         return self.user.username
 
 class ProductBacklog(models.Model):
-    total_story_points = models.IntegerField(default=0)
-    remaining_story_points = models.IntegerField(default=0)
-    total_number_of_pbi = models.IntegerField(default=0)
     project = models.OneToOneField(Project, models.CASCADE)
 
     def __str__(self):
@@ -131,7 +128,6 @@ class Confirmation(models.Model):
 class SprintBacklog(models.Model):
     sprint_number = models.IntegerField()
     hours_available = models.IntegerField(default=0)
-    remaining_hours = models.FloatField(default=0)
     pbi = models.ManyToManyField(PBI)
     is_current_sprint = models.BooleanField(default=False)
     INPROGRESS = 'INP'

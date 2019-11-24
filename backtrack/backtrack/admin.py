@@ -32,12 +32,6 @@ class ProjectAdmin(admin.ModelAdmin):
 
 class ProductBacklogAdmin(admin.ModelAdmin):
     admin.site.register(ProductBacklog)
-    list_display = (
-        'total_story_points',
-        'remaining_story_points',
-        'total_number_of_pbi',
-        'project'
-    )
 
 class PBIAdmin(admin.ModelAdmin):
     admin.site.register(PBI)

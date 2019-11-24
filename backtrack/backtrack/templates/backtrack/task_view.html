@@ -30,11 +30,13 @@
 		<a class="btn btn-primary btn-lg" 
 				href="{% url 'backtrack:view sb' project_name %}" 
 				role="button">View SprintBacklog</a>
-		{% if sb.is_current_sprint %}
-			<a class="btn btn-primary btn-lg" 
+		{% if sb.status == 'INP' and user.role == 'DEV' %}
+			<a	id="add_task"
+				class="btn btn-primary btn-lg" 
 				href="{% url 'backtrack:add task' project_name %}" 
 				role="button">Add task</a>
 		{% endif %}
+		{% if user.role == 'DEV' %}
 		{% if view_my_task %}
 			<a class="btn btn-primary btn-lg" 
 				href="{% url 'backtrack:view task' pk %}" 
@@ -43,6 +45,7 @@
 			<a class="btn btn-primary btn-lg" 
 				href="{% url 'backtrack:view task' pk %}?view_my_task=True" 
 				role="button">View My Tasks</a>
+		{% endif %}
 		{% endif %}
 	</div><br><br>
 	
@@ -99,31 +102,32 @@
 </body>
 
 <script>
-	$(".taskInfo").dblclick(function() {
-		var id = $(this).attr('id')
-		var contributor = $(this).children(".InfoText").children(".Contributor").text()
-		var cur_user = "{{ user.username }}"
-		var role = "{{ user.role }}"
-		if (cur_user === contributor && role === "DEV") {
-			var url = "{% url 'backtrack:update task' 12345 %}"
-			url = url.replace('12345', id)
-			window.location.href = url
-		} else if (role === 'DEV') {
-			var change_contrib = confirm("Do you want to change the contributor to you?")
-			if (change_contrib) {
-				$.ajax({
-					url: "{% url 'backtrack:change contrib' %}",
-					type: 'GET',
-					data:{'task_id': id, 'sb_id': "{{ sb.id }}"},
-					success: function(arg) {
-						alert("Changed the contributor to you!")
-						var url = window.location.href
-						window.location.href = url
-					}
-            })
+	if ($("#add_task").length > 0) {
+		$(".taskInfo").dblclick(function() {
+			var id = $(this).attr('id')
+			var contributor = $(this).children(".InfoText").children(".Contributor").text()
+			var cur_user = "{{ user.username }}"
+			if (cur_user === contributor) {
+				var url = "{% url 'backtrack:update task' 12345 %}"
+				url = url.replace('12345', id)
+				window.location.href = url
+			} else {
+				var change_contrib = confirm("Do you want to change the contributor to you?")
+				if (change_contrib) {
+					$.ajax({
+						url: "{% url 'backtrack:change contrib' %}",
+						type: 'GET',
+						data:{'task_id': id, 'sb_id': "{{ sb.id }}"},
+						success: function(arg) {
+							alert("Changed the contributor to you!")
+							var url = window.location.href
+							window.location.href = url
+						}
+				})
+				}
 			}
-		}
-	})
+		})
+	}
 </script>
 
 </html>

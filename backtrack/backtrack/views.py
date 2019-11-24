@@ -150,13 +150,7 @@ class AddTask(CreateView):
     def form_valid(self, form):
         form.instance.sprint_backlog = self.current_sprint
         user = self.request.user
-        if user.is_authenticated and user.role == User.DEVELOPER:
-            form.instance.developer = Developer.objects.get(
-                user=user
-            )
-        self.current_sprint.remaining_hours += \
-            form.instance.total_hours
-        self.current_sprint.save()
+        form.instance.developer = Developer.objects.get(user=user)
         return super().form_valid(form)
 
 class UpdateTask(UpdateView):
@@ -168,14 +162,6 @@ class UpdateTask(UpdateView):
         if form.has_changed() and \
             ('finished_hours' in form.changed_data or \
                 'total_hours' in form.changed_data):
-            sb = self.object.sprint_backlog
-            sb.remaining_hours = sb.remaining_hours - \
-                (self.object.total_hours - \
-                    self.object.finished_hours)
-            sb.remaining_hours = sb.remaining_hours + \
-                (form.instance.total_hours - \
-                    form.instance.finished_hours)
-            sb.save()
             if form.instance.finished_hours == 0:
                 form.instance.status = Task.NOTSTARTED
             elif form.instance.finished_hours < \
@@ -371,17 +357,6 @@ class ModifyPBI(UpdateView):
     
     def form_valid(self, form, confirmation_form):
         if form.has_changed():
-            if form.instance.storypoints:
-                pb = self.object.product_backlog
-                pb.remaining_story_points = \
-                    pb.remaining_story_points - \
-                        self.object.storypoints \
-                        + form.instance.storypoints
-                pb.total_story_points = \
-                    pb.total_story_points - \
-                        self.object.storypoints \
-                        + form.instance.storypoints
-                pb.save()
             form.save()
         if confirmation_form.has_changed():
             confirmation_form.save()
