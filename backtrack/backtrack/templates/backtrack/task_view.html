@@ -35,6 +35,15 @@
 				href="{% url 'backtrack:add task' project_name %}" 
 				role="button">Add task</a>
 		{% endif %}
+		{% if view_my_task %}
+			<a class="btn btn-primary btn-lg" 
+				href="{% url 'backtrack:view task' pk %}" 
+				role="button">View All Tasks</a>
+		{% else %}
+			<a class="btn btn-primary btn-lg" 
+				href="{% url 'backtrack:view task' pk %}?view_my_task=True" 
+				role="button">View My Tasks</a>
+		{% endif %}
 	</div><br><br>
 	
 	

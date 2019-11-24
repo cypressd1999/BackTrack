@@ -268,6 +268,10 @@ class TaskView(ListView, SingleObjectMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.GET.get('view_my_task'):
+            context['view_my_task'] = True
+        else:
+            context['view_my_task'] = False
         pbi_list = self.get_queryset()
         row_data_list = []
         total_storypoints = 0; inf = False
@@ -283,6 +287,9 @@ class TaskView(ListView, SingleObjectMixin):
             total_hours = 0
             for task in pbi.task_set.all():
                 if task.sprint_backlog.id != self.object.id:
+                    continue
+                if context['view_my_task'] and task.developer != \
+                        self.request.user.developer:
                     continue
                 if task.status == Task.NOTSTARTED:
                     task_no.append(task)
@@ -300,6 +307,7 @@ class TaskView(ListView, SingleObjectMixin):
                 )
             )
         context['sb'] = self.object
+        context['pk'] = self.object.pk
         context['row_data_list'] = row_data_list
         context['total_storypoints'] = total_storypoints
         context['hours_available'] = self.object.hours_available
