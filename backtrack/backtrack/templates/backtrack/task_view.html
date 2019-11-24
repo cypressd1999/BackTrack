@@ -103,9 +103,14 @@
 			var change_contrib = confirm("Do you want to change the contributor to you?")
 			if (change_contrib) {
 				$.ajax({
-                url: "{% url 'backtrack:change contrib' %}",
-                type: 'GET',
-                data:{'task_id': id, 'sb_id': "{{ sb.id }}"},
+					url: "{% url 'backtrack:change contrib' %}",
+					type: 'GET',
+					data:{'task_id': id, 'sb_id': "{{ sb.id }}"},
+					success: function(arg) {
+						alert("Changed the contributor to you!")
+						var url = window.location.href
+						window.location.href = url
+					}
             })
 			}
 		}

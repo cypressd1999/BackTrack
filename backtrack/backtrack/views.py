@@ -1,4 +1,5 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, \
+    JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView
@@ -191,11 +192,8 @@ def ajax_change_contrib(request):
     task = Task.objects.get(pk=task_id)
     task.developer = user.developer
     task.save()
-    return HttpResponseRedirect(
-        reverse('backtrack:view task', kwargs={
-            'pk': sb_id
-        }),
-    )
+    arg = {'success': True}
+    return JsonResponse(arg)
 
 class PBView(ListView):
     model = PBI
@@ -399,5 +397,6 @@ class LoginView(LoginView):
     template_name = 'backtrack/login.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['next'] = reverse('backtrack:create project')
+        context['next'] = reverse('backtrack:view task',
+        kwargs={'pk': 1})
         return context
