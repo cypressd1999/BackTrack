@@ -1,0 +1,28 @@
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+{% if user.role == 'PO' %}
+<form action="{% url 'backtrack:delete pbi' project.name %}" \
+    method="POST">
+    {% csrf_token %}
+    {% for pbi in project.productbacklog.pbi_set.all %}
+        <input type="checkbox" name="pbi" \
+            id="pbi{{ forloop.counter }}" \
+            value="{{ pbi.id }}">
+        <label for="pbi{{ forloop.counter }}">
+            {{ pbi.title }}
+        </label><br>
+    {% endfor %}
+<input type="submit" value="delete" class="btn btn-success">
+</form>
+{% endif %}
