@@ -14,25 +14,6 @@
 
 </head>
 <body>
-    <script>
-        function showFullView(){
-            for (pbi in pbi_list){
-                if (pbi.status=='FN'){
-                    ele = document.getElementById(pbi.id);
-                    ele.style.display = "inline";
-                }
-            }
-        }
-        function showPartialView(){
-            for (pbi in pbi_list){
-                if (pbi.status=='FN'){
-                    ele = document.getElementById(pbi.id);
-                    ele.style.display = "none";
-                }
-            }
-        }
-    </script>
-
     <h1>Product Backlog</h1>
     <div>
         <a class="btn btn-primary" role="button"
