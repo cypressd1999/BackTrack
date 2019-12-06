@@ -32,6 +32,11 @@
         <a class="btn btn-primary" role="button"
         href="{% url 'backtrack:view sb' project_name %}">
         View Sprints</a>
+        {% if user.role == 'PO' %}
+            <a class="btn btn-primary" role="button"
+            href="{% url 'backtrack:showPartialView' project_name %}">
+            Show partial view</a>
+        {% endif %}
     </div>
     <div>
         <table class="table table-striped table-bordered">
