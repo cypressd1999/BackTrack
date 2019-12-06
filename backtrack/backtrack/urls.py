@@ -14,6 +14,7 @@ urlpatterns = [
     path("<int:pk>/end_sprint", views.EndSprint.as_view(), name="end sprint"),
     path("<project_name>/add_task", views.AddTask.as_view(), name="add task"),
     path("<project_name>/view_pb", views.PBView.as_view(), name="view pb"),
+    path("<project_name>/view_pb_partial", views.PBView_partial.as_view(), name="showPartialView"),  
     path("<project_name>/view_sb", views.SBView.as_view(), name="view sb"),
     path("<int:pk>/view_task", views.TaskView.as_view(), name="view task"),
     path("<int:pk>/update_task", views.UpdateTask.as_view(), name="update task"),
