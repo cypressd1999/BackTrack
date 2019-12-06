@@ -1,0 +1,94 @@
+{% load backtrack_extra %}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+<!DOCTYPE html>
+
+<head>
+
+</head>
+<body>
+    <script>
+        function showFullView(){
+            for (pbi in pbi_list){
+                if (pbi.status=='FN'){
+                    ele = document.getElementById(pbi.id);
+                    ele.style.display = "inline";
+                }
+            }
+        }
+        function showPartialView(){
+            for (pbi in pbi_list){
+                if (pbi.status=='FN'){
+                    ele = document.getElementById(pbi.id);
+                    ele.style.display = "none";
+                }
+            }
+        }
+    </script>
+
+    <h1>Product Backlog</h1>
+    <div>
+        <a class="btn btn-primary" role="button"
+         href="{% url 'backtrack:add pbi' project_name %}">
+         Add PBI</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:delete pbi' project_name %}">
+        Delete PBI</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:create sb' project_name %}">
+        Create Sprint</a>
+        <a class="btn btn-primary" role="button"
+        href="{% url 'backtrack:view sb' project_name %}">
+        View Sprints</a>
+        {% if user.role == 'PO' %}
+            <a class="btn btn-primary" role="button"
+            href="{% url 'backtrack:view pb' project_name %}">
+            Show Full view</a>
+        {% endif %}
+    </div>
+    <div>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Story Points</th>
+                    <th scope="col">Sprint Number</th>
+                    <th scope="col">Accumulated Story Points</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            {% for pbi in pbi_list %}
+            {% if pbi.status != 'FN' %}
+            <tr>
+                <td><a href="{% url 'backtrack:view pbi' pbi.pk %}">
+                    {{ pbi.title }}</a></td>
+                <td>{{ pbi.storypoints|default_if_none:'Not decided' }}</td>
+                <td>
+                    {% for sb in pbi.sprintbacklog_set.all %}
+                        {% if forloop.last %}
+                            {{ sb.sprint_number }}
+                        {% else %}
+                            {{ sb.sprint_number }},
+                        {% endif %}
+                    {% empty %}
+                        None
+                    {% endfor %}
+                </td>
+                <td>{{ CumStoryPoints|index:forloop.counter }}</td>
+                <td>{{ pbi.status }}</td>
+            </tr>
+            {% endif %}
+            {% empty %}
+                <p>No existing PBIs, please add one</p>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
