@@ -291,6 +291,35 @@ class PBView(ListView):
         context['CumStoryPoints'] = CumStoryPoints
         return context
 
+class PBView_partial(ListView):
+    model = PBI
+    template_name = "backtrack/view_pb_partial.html"
+
+    def get_queryset(self):
+        return PBI.objects.filter(
+            product_backlog__project__name=\
+                self.kwargs.get('project_name')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_name']= self.kwargs.get('project_name')
+        pbi_list = self.get_queryset()
+        CumStoryPoints = [0]
+        inf = False
+        for pbi in pbi_list:
+            if inf:
+                CumStoryPoints.append('inf')
+            elif pbi.storypoints is None:
+                inf = True
+                CumStoryPoints.append('inf')
+            else :
+                CumStoryPoints.append(
+                    CumStoryPoints[-1]+pbi.storypoints
+                )
+        context['CumStoryPoints'] = CumStoryPoints
+        return context
+    
 class SBView(ListView):
     model = SprintBacklog
     template_name = "backtrack/sb_view.html"
