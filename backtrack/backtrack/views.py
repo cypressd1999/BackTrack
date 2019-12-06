@@ -2,9 +2,11 @@ from django.http import HttpResponseRedirect, HttpResponse, \
     JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import ListView, DetailView
+from django.views import View
+from django.views.generic import ListView, DetailView, \
+    TemplateView
 from django.views.generic.edit import CreateView, DeleteView, \
-    UpdateView
+    UpdateView, FormView
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
@@ -78,13 +80,7 @@ def deletePBI(request, project_name):
                         "You cannot delete a started pbi"
                     }
                 )
-            if selected_pbi.storypoints:
-                pb.total_story_points -= \
-                    selected_pbi.storypoints
-                pb.remaining_story_points -= \
-                    selected_pbi.storypoints
             selected_pbi.delete()
-            pb.save()
         return HttpResponseRedirect(
             reverse('backtrack:view pb', 
             kwargs={'project_name': project_name})
@@ -124,8 +120,93 @@ class CreateSB(CreateView):
             last_sprint.is_current_sprint = False
             form.instance.is_current_sprint = True
             last_sprint.save()
-        return super().form_valid(form)
+        form.save()
+        if form.instance.pbi.count() > 0:
+            for item in form.instance.pbi.all():
+                item.status = PBI.INPROGRESS
+                item.save()
+        return HttpResponseRedirect(
+                form.instance.get_absolute_url()
+            )
 
+class AddPBItoSB(FormView):
+    form_class = AddPBIToSBForm
+    template_name = "backtrack/add_pbi_to_sb.html"
+
+    def form_valid(self, form):
+        sb = SprintBacklog.objects.get(pk=self.kwargs.get('pk'))
+        for pbi in form.cleaned_data['pbi']:
+            sb.pbi.add(pbi)
+            pbi.status = PBI.INPROGRESS
+            pbi.save()
+        sb.save()
+        return HttpResponseRedirect(
+            reverse("backtrack:view task",
+            kwargs={'pk': sb.id})
+        )
+
+class DeletePBIFromSB(FormView):
+    form_class = DeletePBIFromSBForm
+    template_name = "backtrack/delete_pbi_from_sb.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'pk': self.kwargs.get('pk')})
+        return kwargs
+    
+    def get(self, request, *args, **kwargs):
+        sb = SprintBacklog.objects.get(pk=self.kwargs.get('pk'))
+        if sb.pbi.count() <= 1:
+            return HttpResponse("<strong>Sprint backlog must"
+            "contain at least 1 pbi,"
+            "so you can not delete now!</strong>")
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        selected_pbis = form.cleaned_data['pbi']
+        sb = SprintBacklog.objects.get(pk=self.kwargs.get('pk'))
+        for pbi in selected_pbis:
+            sb.pbi.remove(pbi)
+            pbi.status = PBI.NOTSTARTED
+            pbi.save()
+        sb.save()
+        return HttpResponseRedirect(
+            reverse("backtrack:view task",
+                kwargs={'pk': sb.id})
+        )
+
+class StartSprint(SingleObjectMixin, View):
+    model = SprintBacklog
+
+    def get(self, request, *args, **kwargs):
+        sb = self.get_object()
+        sb.status = SprintBacklog.INPROGRESS
+        sb.save()
+        return HttpResponseRedirect(
+            reverse("backtrack:view task", 
+                kwargs={'pk': kwargs.get('pk')})
+        )
+
+class EndSprint(SingleObjectMixin, View):
+    model = SprintBacklog
+
+    def get(self, request, *args, **kwargs):
+        sb = self.get_object()
+        sb.status = SprintBacklog.FINISHED
+        for pbi in sb.pbi.all():
+            if pbi.check_if_finished_all_tasks():
+                pbi.status = PBI.FINISHED
+            else:
+                pbi.status = PBI.NOTSTARTED
+            pbi.save()
+        sb.save()
+        return HttpResponseRedirect(reverse(
+            "backtrack:view pb",
+            kwargs={
+                'project_name': pbi.product_backlog.project.name
+            }
+        ))
 
 class AddTask(CreateView):
     form_class = TaskForm

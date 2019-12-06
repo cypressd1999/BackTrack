@@ -32,7 +32,7 @@ class SBForm(forms.ModelForm):
                 PBI.objects.filter(
                     product_backlog__project__name=\
                         self.project_name
-                ).exclude(status=PBI.FINISHED)
+                ).filter(status=PBI.NOTSTARTED)
 
     class Meta:
         model = SprintBacklog
@@ -43,6 +43,36 @@ class SBForm(forms.ModelForm):
         widgets = {
             'pbi': forms.CheckboxSelectMultiple
         }
+
+class DeletePBIFromSBForm(forms.Form):
+    pbi = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple
+    )
+    
+    def __init__(self, *args, **kwargs):
+        try:
+            sb_id = kwargs.pop('pk')
+            sb = SprintBacklog.objects.get(pk=sb_id)
+        except (KeyError, SprintBacklog.DoesNotExist):
+            super().__init__(*args, **kwargs)
+            self.fields['pbi'].queryset = PBI.objects.all()
+        else:
+            super().__init__(*args, **kwargs)
+            self.fields['pbi'].queryset = sb.pbi.all()
+
+    def clean_pbi(self):
+        selected_pbis = self.cleaned_data['pbi']
+        if self.fields['pbi'].queryset.count()-len(selected_pbis)<1:
+            raise forms.ValidationError("The sprint backlog must "
+                    "contain at least 1 pbi!")
+        return selected_pbis
+
+class AddPBIToSBForm(forms.Form):
+    pbi = forms.ModelMultipleChoiceField(
+        queryset=PBI.objects.filter(status=PBI.NOTSTARTED),
+        widget=forms.CheckboxSelectMultiple
+    )
 
 class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

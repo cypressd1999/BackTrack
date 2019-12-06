@@ -25,27 +25,43 @@
 
 	<div id="SprintFunctions">
 		<h3>Current Sprint Capacity: {{ hours_available }}</h3></nobr>
-		<h3>&nbsp</h3>
-		<h3>&nbsp</h3>
 		<a class="btn btn-primary btn-lg" 
 				href="{% url 'backtrack:view sb' project_name %}" 
 				role="button">View SprintBacklog</a>
-		{% if sb.status == 'INP' and user.role == 'DEV' %}
-			<a	id="add_task"
-				class="btn btn-primary btn-lg" 
-				href="{% url 'backtrack:add task' project_name %}" 
-				role="button">Add task</a>
-		{% endif %}
 		{% if user.role == 'DEV' %}
-		{% if view_my_task %}
-			<a class="btn btn-primary btn-lg" 
-				href="{% url 'backtrack:view task' pk %}" 
-				role="button">View All Tasks</a>
-		{% else %}
-			<a class="btn btn-primary btn-lg" 
-				href="{% url 'backtrack:view task' pk %}?view_my_task=True" 
-				role="button">View My Tasks</a>
-		{% endif %}
+			{% if sb.status == sb.NOTSTARTED %}
+				<a	id="start_sb"
+					class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:start sprint' pk %}" 
+					role="button">Start Sprint</a>
+			{% elif sb.status == sb.INPROGRESS %}
+				<a	id="add_task"
+					class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:add task' project_name %}" 
+					role="button">Add task</a>
+				<a	id="add_pbi"
+					class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:add pbi to sb' pk %}" 
+					role="button">Add PBI</a>
+				<a	id="delete_pbi"
+					class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:delete pbi from sb' pk %}" 
+					role="button">Delete PBI</a>
+				<a	id="end_sb"
+					class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:end sprint' pk %}" 
+					role="button">End Sprint</a>
+			{% endif %}
+			
+			{% if view_my_task %}
+				<a class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:view task' pk %}" 
+					role="button">View All Tasks</a>
+			{% else %}
+				<a class="btn btn-primary btn-lg" 
+					href="{% url 'backtrack:view task' pk %}?view_my_task=True" 
+					role="button">View My Tasks</a>
+			{% endif %}
 		{% endif %}
 	</div><br><br>
 	

@@ -111,6 +111,24 @@ class PBI(models.Model):
             'project_name': self.product_backlog.project.name
             }
         )
+    
+    def check_if_finished_all_tasks(self):
+        if self.status == self.NOTSTARTED:
+            return False
+        if self.status == self.FINISHED:
+            return True
+        current_sprint = self.sprintbacklog_set.get(
+            is_current_sprint=True
+        )
+        task_set = self.task_set.filter(
+            sprint_backlog=current_sprint
+        )
+        if task_set.count() == 0:
+            return False
+        for task in task_set.all():
+            if task.total_hours != task.finished_hours:
+                return False
+        return True
 
     class Meta:
         ordering = ('priority',)
@@ -143,6 +161,14 @@ class SprintBacklog(models.Model):
         max_length=20,
         default=NOTSTARTED
     )
+
+    def get_notstarted_pb(self):
+        pb = self.pbi.all()[0].product_backlog
+        not_started_pbis = []
+        for pbi in pb.pbi_set.all():
+            if pbi.status == PBI.NOTSTARTED:
+                not_started_pbis.append(pbi)
+        return not_started_pbis
 
     def get_absolute_url(self):
         return reverse('backtrack:view sb',
