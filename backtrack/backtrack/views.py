@@ -28,11 +28,19 @@ class AddPBI(CreateView):
         pb = ProductBacklog.objects.get(
             project=self.kwargs.get('project_name')
         )
+	#collision resolve
+        priority_new=form.cleaned_data.get("priority")
+        pbis_in_this_project=PBI.objects.filter(product_backlog=pb)
+        number_of_existing_pbi=pbis_in_this_project.count()
+        if priority_new<=0:
+            new_pbi.priority=1
+        if priority_new>number_of_existing_pbi:
+            new_pbi.priority=number_of_existing_pbi+1
+        for pbi_exist in pbis_in_this_project.filter(priority__gte=new_pbi.priority):
+            pbi_exist.priority=pbi_exist.priority+1
+            pbi_exist.save()
+        #collision solved
         new_pbi.product_backlog = pb
-        if new_pbi.storypoints:
-            pb.total_story_points += new_pbi.storypoints
-            pb.remaining_story_points += new_pbi.storypoints
-            pb.save()
         new_pbi.save()
         return super().form_valid(form)
 
@@ -71,6 +79,9 @@ def deletePBI(request, project_name):
             }
         )
     else:
+	#solve the collision
+        largest_priority=0
+        count=0
         for selected_pbi in selected_pbis:
             if selected_pbi.status != PBI.NOTSTARTED:
                 return render(
@@ -81,7 +92,17 @@ def deletePBI(request, project_name):
                         "You cannot delete a started pbi"
                     }
                 )
+            the_priority=selected_pbi.priority
+            if the_priority>largest_priority:
+                largest_priority=the_priority
+            count=count+1
             selected_pbi.delete()
+        the_priority=selected_pbi.priority
+        up_pbis=PBI.objects.filter(product_backlog=pb).filter(priority__gt=largest_priority)
+        for pbi_up in up_pbis:
+            pbi_up.priority=pbi_up.priority-count
+            pbi_up.save()
+        ##collision solved
         return HttpResponseRedirect(
             reverse('backtrack:view pb', 
             kwargs={'project_name': project_name})
@@ -468,7 +489,49 @@ class ModifyPBI(UpdateView):
     
     def form_valid(self, form, confirmation_form):
         if form.has_changed():
+            ##solve collision
+            pre_changed=self.get_object()
+            pb = pre_changed.product_backlog
+            pbis_in_project=PBI.objects.filter(product_backlog=pb)
+            no_of_pbis=pbis_in_project.count()
+            old_priority=pre_changed.priority
+            new_priority=form.cleaned_data['priority']
+            #deal with the status
+            new_status=form.cleaned_data['status']
+            if new_status=='FN':
+                new_priority=0
+            elif new_priority<=0:
+                new_priority=1
+            elif new_priority>no_of_pbis:
+                new_priority=no_of_pbis
+            
+            #increase the priority
+            if new_priority==0 and new_priority!=old_priority:
+                up_pbis=pbis_in_project.filter(priority__gt=old_priority)
+                for pbi_up in up_pbis:
+                    pbi_up.priority=pbi_up.priority-1
+                    pbi_up.save()
+            elif old_priority==0 and new_priority!=0:
+                    down_pbis=pbis_in_project.filter(priority__gte=new_priority)
+                    for pbi_down in down_pbis:
+                        pbi_down.priority=pbi_down.priority+1
+                        pbi_down.save()
+            elif old_priority>new_priority:
+                down_pbis=pbis_in_project.filter(priority__gte=new_priority).filter(priority__lt=old_priority)
+                for pbi_down in down_pbis:
+                    pbi_down.priority=pbi_down.priority+1
+                    pbi_down.save()
+            elif old_priority<new_priority:
+                up_pbis=pbis_in_project.filter(priority__lte=new_priority).filter(priority__gt=old_priority)
+                for pbi_up in up_pbis:
+                    pbi_up.priority=pbi_up.priority-1
+                    pbi_up.save()
+            #save the modified pbi
             form.save()
+            changed=self.get_object()
+            changed.priority=new_priority
+            changed.save()
+            ##collision solved
         if confirmation_form.has_changed():
             confirmation_form.save()
         return HttpResponseRedirect(self.get_success_url())

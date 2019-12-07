@@ -5,7 +5,7 @@ class PBIForm(forms.ModelForm):
     class Meta:
         model = PBI
         fields = ('title', 'card', 'conversation', \
-            'storypoints', 'priority')
+            'storypoints', 'priority','status')
 
 PBIFormSet = forms.inlineformset_factory(
     PBI, Confirmation, fields=('content', 'done')
