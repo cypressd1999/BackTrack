@@ -89,6 +89,13 @@ def deletePBI(request, project_name):
                         "You cannot delete a started pbi"
                     }
                 )
+	    #solve the collision
+            the_priority=selected_pbi.priority
+            up_pbis=PBI.objects.filter(product_backlog=pb).filter(priority__gt=the_priority)
+            for pbi_up in up_pbis:
+                pbi_up.priority=pbi_up.priority-1
+                pbi_up.save()
+            ##collision solved
             selected_pbi.delete()
         return HttpResponseRedirect(
             reverse('backtrack:view pb', 
