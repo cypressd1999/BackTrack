@@ -25,14 +25,22 @@ class AddPBI(CreateView):
                 name=self.kwargs.get('project_name')
         )
         new_pbi = form.save(commit=False)
+	#collision resolve
+        priority_new=form.cleaned_data.get("priority")
+        pbis_in_this_project=PBI.objects.filter(product_backlog=pb)
+        number_of_existing_pbi=pbis_in_this_project.count()
+        if priority_new==0:
+            new_pbi.priority=1
+        if priority_new>number_of_existing_pbi:
+            new_pbi.priority=number_of_existing_pbi+1
+        for pbi_exist in pbis_in_this_project.filter(priority__gte=new_pbi.priority):
+            pbi_exist.priority=pbi_exist.priority+1
+            pbi_exist.save()
+        #collision solved
         pb = ProductBacklog.objects.get(
             project=self.kwargs.get('project_name')
         )
         new_pbi.product_backlog = pb
-        if new_pbi.storypoints:
-            pb.total_story_points += new_pbi.storypoints
-            pb.remaining_story_points += new_pbi.storypoints
-            pb.save()
         new_pbi.save()
         return super().form_valid(form)
 
