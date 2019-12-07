@@ -79,6 +79,9 @@ def deletePBI(request, project_name):
             }
         )
     else:
+	#solve the collision
+        largest_priority=0
+        count=0
         for selected_pbi in selected_pbis:
             if selected_pbi.status != PBI.NOTSTARTED:
                 return render(
@@ -89,14 +92,17 @@ def deletePBI(request, project_name):
                         "You cannot delete a started pbi"
                     }
                 )
-	    #solve the collision
             the_priority=selected_pbi.priority
-            up_pbis=PBI.objects.filter(product_backlog=pb).filter(priority__gt=the_priority)
-            for pbi_up in up_pbis:
-                pbi_up.priority=pbi_up.priority-1
-                pbi_up.save()
-            ##collision solved
+            if the_priority>largest_priority:
+                largest_priority=the_priority
+            count=count+1
             selected_pbi.delete()
+        the_priority=selected_pbi.priority
+        up_pbis=PBI.objects.filter(product_backlog=pb).filter(priority__gt=largest_priority)
+        for pbi_up in up_pbis:
+            pbi_up.priority=pbi_up.priority-count
+            pbi_up.save()
+        ##collision solved
         return HttpResponseRedirect(
             reverse('backtrack:view pb', 
             kwargs={'project_name': project_name})
