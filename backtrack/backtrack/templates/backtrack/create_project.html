@@ -1,4 +1,10 @@
-{% load bootstrap4 %}
+
+{% extends 'backtrack/base.html' %}
+
+{% block content %}
+	
+	
+        {% load bootstrap4 %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
@@ -6,6 +12,9 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
+
+<h2>Create Project</h2>
+<br>
 
 <form action="" method="post">
     {% csrf_token %}
@@ -15,3 +24,5 @@
     <button type="submit" class="btn btn-success">Create</button>
     {% endif %}
 </form>
+
+{% endblock %}

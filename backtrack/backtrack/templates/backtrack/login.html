@@ -1,10 +1,35 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="../../static/backtrack/task_view.css">
+
+</head>
+<body>
+<style type="text/css">
+	body {
+
+		margin: auto;
+		top: 100px;
+		width: 60%;
+	}
+</style>
+
+<div style="text-align: center">
+	<h1>Login</h1>
+</div>
+
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
+<div style="border: 3px solid; margin: auto; width: 70%;">
 <form method="post" action="{% url 'backtrack:login' %}">
 {% csrf_token %}
-<table>
+<!--table>
 <tr>
     <td>{{ form.username.label_tag }}</td>
     <td>{{ form.username }}</td>
@@ -13,8 +38,17 @@
     <td>{{ form.password.label_tag }}</td>
     <td>{{ form.password }}</td>
 </tr>
-</table>
+</table-->
 
-<input type="submit" value="login">
-<input type="hidden" name="next" value="{{ next }}">
+<h3 style="text-align:center">{{ form.username.label_tag }} {{ form.username }}</h3>
+<h3 style="text-align:center">{{ form.password.label_tag }} {{ form.password }}</h3>
+	<div style="margin-left: 250px">
+		<input type="submit" value="login">
+		<input type="hidden" name="next" value="{{ next }}">
+	</div>
 </form>
+</div>
+
+
+
+</body>

@@ -1,3 +1,7 @@
+{% extends 'backtrack/base.html' %}
+
+{% block content %}
+
 {% load bootstrap4 %}
 
 {# Load CSS and JavaScript #}
@@ -7,9 +11,14 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
+<h2>Delete PBI from Sprint Backlog</h2>
+<br>
+
 <form action="" method="post">
     {% csrf_token %}
     {% bootstrap_form_errors form %}
     {% bootstrap_form form %}
     <button type="submit" class="btn btn-success">Delete</button>
 </form>
+
+{% endblock %}

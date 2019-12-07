@@ -491,8 +491,7 @@ class LoginView(LoginView):
     template_name = 'backtrack/login.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['next'] = reverse('backtrack:view task',
-        kwargs={'pk': 1})
+        context['next'] = reverse('backtrack:index')
         return context
 		
 class IndexView(TemplateView):

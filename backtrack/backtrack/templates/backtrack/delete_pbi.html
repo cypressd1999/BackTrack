@@ -1,3 +1,7 @@
+{% extends 'backtrack/base.html' %}
+
+{% block content %}
+
 {% load bootstrap4 %}
 
 {# Load CSS and JavaScript #}
@@ -10,6 +14,9 @@
 {% if error_message %}
     <p><strong>{{ error_message }}</strong></p>
 {% endif %}
+
+<h2>Delete PBI</h2>
+<br>
 
 {% if user.role == 'PO' %}
 <form action="{% url 'backtrack:delete pbi' project.name %}" \
@@ -26,3 +33,5 @@
 <input type="submit" value="delete" class="btn btn-success">
 </form>
 {% endif %}
+
+{% endblock %}

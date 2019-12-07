@@ -1,21 +1,32 @@
+{% load bootstrap4 %}
 
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
 
-<!--form method="post" action="{% url 'backtrack:login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 
-<input type="submit" value="login">
-<input type="hidden" name="next" value="{{ next }}">
-</form-->
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackTrack</title>
+	
+	
+	<link rel="stylesheet" type="text/css" href="../../static/backtrack/task_view.css">
 
-<h3>BackTrack</h3>
-<a href="{% url 'backtrack:login' %}">Login</a>
+</head>
+<body>
+	<h1 style="text-align: center; font-size: 100px;">BackTrack</h1>
+	<br>
+	<br>
+	<br>
+	<div style="text-align: center">
+	<a class="btn btn-primary" 
+	href="{% url 'backtrack:create project' %}" 
+    role="button">Create Project</a>
+	</div>
+	<!--a href="{% url 'backtrack:login' %}">Login</a-->
+</body>
+</html>

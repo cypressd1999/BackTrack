@@ -3,8 +3,8 @@ from . import views
 
 app_name = 'backtrack'
 urlpatterns = [
-	path('', views.IndexView.as_view(), name='index'),
     path("login/", views.LoginView.as_view(), name="login"),
+	path('homepage/', views.IndexView.as_view(), name='index'),
     path("<project_name>/addpbi", views.AddPBI.as_view(), name="add pbi"),
     path("create_project", views.CreateProject.as_view(), name="create project"),
     path("<project_name>/deletepbi", views.deletePBI, name="delete pbi"),
