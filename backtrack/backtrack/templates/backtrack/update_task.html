@@ -10,5 +10,8 @@
 <form action="" method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
+    
+    {% if user.role != 'PO' %}
     <button type="submit" class="btn btn-success">Update</button>
+    {% endif %}
 </form>

@@ -11,6 +11,7 @@
     <p><strong>{{ error_message }}</strong></p>
 {% endif %}
 
+{% if user.role == 'PO' %}
 <form action="{% url 'backtrack:delete pbi' project.name %}" \
     method="POST">
     {% csrf_token %}
@@ -24,3 +25,4 @@
     {% endfor %}
 <input type="submit" value="delete" class="btn btn-success">
 </form>
+{% endif %}
