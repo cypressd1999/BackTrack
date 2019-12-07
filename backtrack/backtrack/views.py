@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView, DeleteView, \
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.views import LoginView
 from django.db.models import Q
+from django.views.generic.base import TemplateView
 
 from backtrack.models import *
 from backtrack.forms import *
@@ -493,3 +494,6 @@ class LoginView(LoginView):
         context['next'] = reverse('backtrack:view task',
         kwargs={'pk': 1})
         return context
+		
+class IndexView(TemplateView):
+	template_name = 'backtrack/index.html'
