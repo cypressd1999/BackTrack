@@ -25,6 +25,9 @@ class AddPBI(CreateView):
                 name=self.kwargs.get('project_name')
         )
         new_pbi = form.save(commit=False)
+        pb = ProductBacklog.objects.get(
+            project=self.kwargs.get('project_name')
+        )
 	#collision resolve
         priority_new=form.cleaned_data.get("priority")
         pbis_in_this_project=PBI.objects.filter(product_backlog=pb)
@@ -37,9 +40,6 @@ class AddPBI(CreateView):
             pbi_exist.priority=pbi_exist.priority+1
             pbi_exist.save()
         #collision solved
-        pb = ProductBacklog.objects.get(
-            project=self.kwargs.get('project_name')
-        )
         new_pbi.product_backlog = pb
         new_pbi.save()
         return super().form_valid(form)
