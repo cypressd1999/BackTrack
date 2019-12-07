@@ -29,7 +29,7 @@ class AddPBI(CreateView):
         priority_new=form.cleaned_data.get("priority")
         pbis_in_this_project=PBI.objects.filter(product_backlog=pb)
         number_of_existing_pbi=pbis_in_this_project.count()
-        if priority_new==0:
+        if priority_new<=0:
             new_pbi.priority=1
         if priority_new>number_of_existing_pbi:
             new_pbi.priority=number_of_existing_pbi+1
