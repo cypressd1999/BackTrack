@@ -22,11 +22,48 @@
 	<br>
 	<br>
 	<br>
+	{% if user.can_create_project %}
 	<div style="text-align: center">
-	<a class="btn btn-primary" 
-	href="{% url 'backtrack:create project' %}" 
-    role="button">Create Project</a>
+		<a class="btn btn-primary" 
+		href="{% url 'backtrack:create project' %}" 
+		role="button">Create Project</a>
 	</div>
-	<!--a href="{% url 'backtrack:login' %}">Login</a-->
+	<br/>
+	<br/>
+	{% endif %}
+	{% if user.can_invite_product_owner %}
+	<div style="text-align: center">
+		<a class="btn btn-primary" 
+			href="{% url 'backtrack:invite product owner' %}" 
+			role="button">Invite Product Owner</a>
+	</div>
+	<br/>
+	<br/>
+	{% endif %}
+	{% if user.can_invite_scrum_master %}
+	<div style="text-align: center">
+			<a class="btn btn-primary" 
+			href="{% url 'backtrack:invite scrum master' %}" 
+			role="button">Invite Scrum Master</a>
+		</div>
+		<br/>
+	<br/>
+	{% endif %}
+	{% if user.can_invite_developers %}
+	<div style="text-align: center">
+			<a class="btn btn-primary" 
+			href="{% url 'backtrack:invite developers' %}" 
+			role="button">Invite Developers</a>
+		</div>
+		<br/>
+		<br/>
+	{% endif %}
+	{% if user.has_project %}
+	<div style="text-align: center">
+			<a class="btn btn-primary" 
+			href="{% url 'backtrack:view pb' user.get_project %}" 
+			role="button">View Product Backlog</a>
+		</div>
+	{% endif %}
 </body>
 </html>

@@ -110,3 +110,21 @@ class ConfirmationForm(forms.ModelForm):
     class Meta:
         model = Confirmation
         fields = ('content', 'done')
+
+class InviteDeveloperForm(forms.Form):
+    dev = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(
+            role=User.DEVELOPER
+        ).filter(developer__project=None),
+        widget=forms.CheckboxSelectMultiple
+    )
+
+class InviteProductOwnerForm(forms.Form):
+    product_owner = forms.ModelChoiceField(
+        queryset=User.objects.filter(role=User.PRODUCTOWNER)
+    )
+
+class InviteScrumMasterForm(forms.Form):
+    scrum_master = forms.ModelChoiceField(
+        queryset=User.objects.filter(role=User.SCRUMMASTER)
+    )

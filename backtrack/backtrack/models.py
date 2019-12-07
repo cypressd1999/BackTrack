@@ -21,6 +21,60 @@ class User(AbstractUser):
         default=ADMIN
     )
 
+    def is_developer(self):
+        return self.role == User.DEVELOPER
+
+    def has_project(self):
+        if self.role == User.DEVELOPER:
+            return not self.developer.project is None
+        elif self.role == User.PRODUCTOWNER:
+            return self.productowner.project_set.count() > 0
+        elif self.role == User.SCRUMMASTER:
+            return not self.scrummaster.project is None
+        else:
+            return False
+
+    def get_project(self):
+        if not self.has_project():
+            return None
+        if self.role == User.DEVELOPER:
+            return self.developer.project
+        elif self.role == User.PRODUCTOWNER:
+            return self.productowner.project_set.all()[0]
+        elif self.role == User.SCRUMMASTER:
+            return self.scrummaster.project
+        else:
+            return None
+    
+    def is_product_owner(self):
+        return self.role == User.PRODUCTOWNER
+
+    def can_create_project(self):
+        if self.role == User.DEVELOPER and \
+            self.developer.project is None:
+                return True
+        return False
+
+    def can_invite_developers(self):
+        if self.role == User.DEVELOPER and \
+            not self.developer.project is None:
+            return True
+        return False
+    
+    def can_invite_product_owner(self):
+        if self.role == User.DEVELOPER and \
+            not self.developer.project is None and \
+            self.developer.project.product_owner is None:
+            return True
+        return False
+    
+    def can_invite_scrum_master(self):
+        if self.role == User.DEVELOPER and \
+            not self.developer.project is None and \
+            self.developer.project.scrummaster_set.count() == 0:
+            return True
+        return False
+
 class ProductOwner(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, models.CASCADE)

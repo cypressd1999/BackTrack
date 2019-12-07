@@ -559,3 +559,63 @@ class LoginView(LoginView):
 		
 class IndexView(TemplateView):
 	template_name = 'backtrack/index.html'
+
+    
+
+class RootView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
+            num_users = User.objects.count()
+            num_superusers = \
+                User.objects.filter(is_superuser=True).count()
+            num_common_users = num_users - num_superusers
+            if num_common_users >= 1:
+                return HttpResponseRedirect(
+                    reverse("backtrack:login"))
+            elif num_users > 1:
+                return HttpResponseRedirect(reverse("admin site"))
+            else:
+                return HttpResponse("Please create a superuser"
+                "in the command line first, then add users through"
+                "admin site.")
+        else:
+            if user.is_superuser:
+                return HttpResponseRedirect(reverse('admin site'))
+            else:
+                return HttpResponseRedirect(
+                    reverse('backtrack:index'))
+
+class InviteDevelopersView(FormView):
+    form_class = InviteDeveloperForm
+    template_name = "backtrack/invite_developers.html"
+
+    def form_valid(self, form):
+        project = self.request.user.developer.project
+        dev_usrs = form.cleaned_data['dev']
+        for usr in dev_usrs:
+            usr.developer.project = project
+            usr.developer.save()
+        return HttpResponseRedirect(reverse('backtrack:index'))
+
+class InviteProductOwnerView(FormView):
+    form_class = InviteProductOwnerForm
+    template_name = "backtrack/invite_product_owner.html"
+
+    def form_valid(self, form):
+        project = self.request.user.developer.project
+        po_user = form.cleaned_data['product_owner']
+        project.product_owner = po_user.productowner
+        project.save()
+        return HttpResponseRedirect(reverse('backtrack:index'))
+
+class InviteScrumMasterView(FormView):
+    form_class = InviteScrumMasterForm
+    template_name = "backtrack/invite_scrum_master.html"
+
+    def form_valid(self, form):
+        project = self.request.user.developer.project
+        sm_usr = form.cleaned_data['scrum_master']
+        sm_usr.scrummaster.project = project
+        sm_usr.scrummaster.save()
+        return HttpResponseRedirect(reverse('backtrack:index'))

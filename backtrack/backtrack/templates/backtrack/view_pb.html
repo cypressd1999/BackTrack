@@ -20,15 +20,19 @@
 
     <h1>Product Backlog</h1>
     <div>
+        {% if user.role == user.PRODUCTOWNER %}
         <a class="btn btn-primary" role="button"
          href="{% url 'backtrack:add pbi' project_name %}">
          Add PBI</a>
         <a class="btn btn-primary" role="button"
         href="{% url 'backtrack:delete pbi' project_name %}">
         Delete PBI</a>
+        {% endif %}
+        {% if user.role == user.DEVELOPER %}
         <a class="btn btn-primary" role="button"
         href="{% url 'backtrack:create sb' project_name %}">
         Create Sprint</a>
+        {% endif %}
         <a class="btn btn-primary" role="button"
         href="{% url 'backtrack:view sb' project_name %}">
         View Sprints</a>

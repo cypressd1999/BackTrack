@@ -3,10 +3,14 @@ from . import views
 
 app_name = 'backtrack'
 urlpatterns = [
+    path("", views.RootView.as_view(), name="root view"),
     path("login/", views.LoginView.as_view(), name="login"),
 	path('homepage/', views.IndexView.as_view(), name='index'),
     path("<project_name>/addpbi", views.AddPBI.as_view(), name="add pbi"),
     path("create_project", views.CreateProject.as_view(), name="create project"),
+    path("invite_developers", views.InviteDevelopersView.as_view(), name="invite developers"),
+    path("invite_product_owner", views.InviteProductOwnerView.as_view(), name="invite product owner"),
+    path("invite_scrum_master", views.InviteScrumMasterView.as_view(), name="invite scrum master"),
     path("<project_name>/deletepbi", views.deletePBI, name="delete pbi"),
     path("<project_name>/create_sb", views.CreateSB.as_view(), name="create sb"),
     path("<int:pk>/start_sprint", views.StartSprint.as_view(), name="start sprint"),
